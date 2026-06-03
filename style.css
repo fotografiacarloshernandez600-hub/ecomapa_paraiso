@@ -210,3 +210,35 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--off);color:#22
   .hero-btns{flex-direction:column;align-items:center}
   .navbar{padding:.6rem 1rem}
 }
+
+/* ── AVISOS PÚBLICOS ─────────────────────────────────────────── */
+.avisos-public{background:var(--g-dark);padding:2.5rem 0}
+.avisos-public-inner{max-width:1060px;margin:0 auto;padding:0 1.5rem}
+.avisos-public-header{display:flex;align-items:center;gap:.65rem;margin-bottom:1.25rem;font-size:1rem;font-weight:700;color:var(--g-accent)}
+.avisos-public-header i{font-size:1.1rem}
+.avisos-count{font-size:.75rem;padding:2px 9px;border-radius:999px;background:rgba(122,191,58,.15);color:var(--g-accent);font-weight:600;margin-left:.25rem}
+.avisos-public-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.85rem}
+.aviso-pub-loading{color:#6a8a6a;font-size:.85rem;padding:1rem 0;display:flex;align-items:center;gap:.5rem}
+.aviso-pub-card{border-radius:var(--radius-lg);padding:1rem 1.15rem;border:1px solid rgba(255,255,255,.08);display:flex;gap:.85rem;align-items:flex-start;animation:fadeUp .4s ease both}
+.aviso-pub-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.aviso-pub-body{flex:1;min-width:0}
+.aviso-pub-titulo{font-size:.9rem;font-weight:700;margin-bottom:.25rem}
+.aviso-pub-msg{font-size:.8rem;line-height:1.55;opacity:.85}
+.aviso-pub-fecha{font-size:.7rem;margin-top:.4rem;opacity:.55}
+.aviso-info{background:rgba(24,95,165,.15);border-color:rgba(24,95,165,.25)}
+.aviso-info .aviso-pub-icon{background:rgba(24,95,165,.2);color:#85B7EB}
+.aviso-info .aviso-pub-titulo{color:#85B7EB}
+.aviso-info .aviso-pub-msg{color:#b0ccee}
+.aviso-alerta{background:rgba(186,117,23,.15);border-color:rgba(186,117,23,.25)}
+.aviso-alerta .aviso-pub-icon{background:rgba(186,117,23,.2);color:#EF9F27}
+.aviso-alerta .aviso-pub-titulo{color:#EF9F27}
+.aviso-alerta .aviso-pub-msg{color:#e0c08a}
+.aviso-suspension{background:rgba(163,45,45,.15);border-color:rgba(163,45,45,.25)}
+.aviso-suspension .aviso-pub-icon{background:rgba(163,45,45,.2);color:#E24B4A}
+.aviso-suspension .aviso-pub-titulo{color:#E24B4A}
+.aviso-suspension .aviso-pub-msg{color:#e0a0a0}
+.aviso-nuevo{background:rgba(74,140,42,.15);border-color:rgba(74,140,42,.25)}
+.aviso-nuevo .aviso-pub-icon{background:rgba(74,140,42,.2);color:#7ABF3A}
+.aviso-nuevo .aviso-pub-titulo{color:#7ABF3A}
+.aviso-nuevo .aviso-pub-msg{color:#a8cc80}
+.avisos-empty{color:#4a6a4a;font-size:.85rem;text-align:center;padding:1.5rem;grid-column:1/-1}
