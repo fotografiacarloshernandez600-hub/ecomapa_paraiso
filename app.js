@@ -427,3 +427,43 @@ document.querySelectorAll(".guia-card,.ruta-card,.punto-item").forEach(el=>{
   el.style.opacity="0";
   io.observe(el);
 });
+
+// ── AVISOS MUNICIPALES EN TIEMPO REAL ────────────────────────
+const AVISO_CFG = {
+  info:       { icon:"fa-circle-info",         clase:"aviso-info" },
+  alerta:     { icon:"fa-triangle-exclamation", clase:"aviso-alerta" },
+  suspension: { icon:"fa-truck",               clase:"aviso-suspension" },
+  nuevo:      { icon:"fa-circle-check",        clase:"aviso-nuevo" },
+};
+
+onSnapshot(collection(db, "avisos"), (snap) => {
+  const lista = document.getElementById("avisosPublicList");
+  const count = document.getElementById("avisosCount");
+  if (!lista) return;
+
+  const avisos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  if (!avisos.length) {
+    lista.innerHTML = `<div class="avisos-empty"><i class="fa-solid fa-check-circle"></i> Sin avisos activos por el momento</div>`;
+    if (count) count.style.display = "none";
+    return;
+  }
+
+  if (count) {
+    count.textContent = avisos.length + (avisos.length === 1 ? " aviso" : " avisos");
+    count.style.display = "inline";
+  }
+
+  lista.innerHTML = avisos.map((a, i) => {
+    const cfg = AVISO_CFG[a.tipo] || AVISO_CFG.info;
+    const fechaStr = a.fecha ? `Válido hasta: ${a.fecha}` : "";
+    return `<div class="aviso-pub-card ${cfg.clase}" style="animation-delay:${i*0.08}s">
+      <div class="aviso-pub-icon"><i class="fa-solid ${cfg.icon}"></i></div>
+      <div class="aviso-pub-body">
+        <div class="aviso-pub-titulo">${a.titulo}</div>
+        <div class="aviso-pub-msg">${a.msg}</div>
+        ${fechaStr ? `<div class="aviso-pub-fecha"><i class="fa-solid fa-calendar" style="font-size:.65rem;margin-right:3px"></i>${fechaStr}</div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+});
