@@ -327,9 +327,12 @@ window.eliminarPunto = async fid => {
 
 // ── AVISOS ────────────────────────────────────────────────────
 function escucharAvisos() {
+  // onSnapshot escucha en tiempo real y también carga el estado inicial
   onSnapshot(collection(db, "avisos"), snap => {
     allAvisos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderAvisos();
+  }, err => {
+    console.error("Error al escuchar avisos:", err);
   });
 }
 
@@ -345,7 +348,7 @@ document.getElementById("btnPublicar")?.addEventListener("click", async () => {
     await addDoc(collection(db, "avisos"), { tipo, titulo, msg, fecha, creado: serverTimestamp() });
     ["avisoTitulo","avisoMsg","avisoFecha"].forEach(id => document.getElementById(id).value = "");
     showAvisoMsg("✅ Aviso publicado correctamente.", "exito");
-  } catch { showAvisoMsg("Error al publicar. Intenta de nuevo.", "error"); }
+  } catch(e) { console.error(e); showAvisoMsg("Error al publicar: " + e.message, "error"); }
 });
 
 function renderAvisos() {
