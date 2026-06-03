@@ -4,15 +4,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAHUel22F1X-_dt21Ua9kY09v1q0xZ2g3A",
-  authDomain: "ecomapa-paraiso.firebaseapp.com",
-  projectId: "ecomapa-paraiso",
-  storageBucket: "ecomapa-paraiso.firebasestorage.app",
-  messagingSenderId: "1042208837869",
-  appId: "1:1042208837869:web:96cd70aec98e049643fce4",
-  measurementId: "G-W8H2BW1GS9"
+  apiKey: "AIzaSyBfx8sY0KnKJ2lP-M3xvBcBz8pSiH33SbQ",
+  authDomain: "ecomapparaiso.firebaseapp.com",
+  projectId: "ecomapparaiso",
+  storageBucket: "ecomapparaiso.firebasestorage.app",
+  messagingSenderId: "667577541725",
+  appId: "1:667577541725:web:7d812b1879c97d7e0819b4"
 };
+
 
 const app = initializeApp(firebaseConfig);
 
