@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoMapa Paraíso · Paraíso, Tabasco</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ── LOADER ──────────────────────────────────────────────── -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-leaf"><i class="fa-solid fa-leaf"></i></div>
+    <div class="loader-title">EcoMapa <span>Paraíso</span></div>
+    <div class="loader-bar"><div class="loader-progress" id="loaderBar"></div></div>
+    <div class="loader-msg" id="loaderMsg">Cargando mapa...</div>
+  </div>
+</div>
+
+<!-- ── NAVBAR ──────────────────────────────────────────────── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-logo">
+    <div class="nav-leaf"><i class="fa-solid fa-leaf"></i></div>
+    <span>EcoMapa <strong>Paraíso</strong></span>
+  </div>
+  <div class="nav-links">
+    <a href="#inicio" class="nav-link active"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+    <a href="#mapa" class="nav-link"><i class="fa-solid fa-map-location-dot"></i><span>Mapa</span></a>
+    <a href="#rutas" class="nav-link"><i class="fa-solid fa-truck"></i><span>Rutas</span></a>
+    <a href="#reportar" class="nav-link"><i class="fa-solid fa-camera"></i><span>Reportar</span></a>
+    <a href="#guia" class="nav-link"><i class="fa-solid fa-recycle"></i><span>Guía</span></a>
+  </div>
+  <a href="#reportar" class="nav-cta"><i class="fa-solid fa-triangle-exclamation"></i> Reportar tiradero</a>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────── -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fa-solid fa-leaf"></i> Proyecto ecológico digital · 2026</div>
+    <h1>Encuentra dónde reciclar<br/><span class="hero-accent">en Paraíso, Tabasco</span></h1>
+    <p>Mapa interactivo con centros de acopio, rutas de recolección y reportes ciudadanos en tiempo real. Gratuito, sin instalar nada.</p>
+    <div class="hero-btns">
+      <a href="#mapa" class="btn-primary"><i class="fa-solid fa-map-pin"></i> Ver el mapa</a>
+      <a href="#reportar" class="btn-outline"><i class="fa-solid fa-camera"></i> Reportar tiradero</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><span class="hstat-n" data-target="5">0</span><small>centros de acopio</small></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-n" data-target="9">0</span><small>rutas de recolección</small></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-n" data-target="60">0</span><small>colonias cubiertas</small></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span>$0</span><small>costo para ti</small></div>
+  </div>
+</section>
+
+<!-- ── MAPA ────────────────────────────────────────────────── -->
+<section class="mapa-section" id="mapa">
+  <div class="mapa-header">
+    <h2><i class="fa-solid fa-map-location-dot"></i> Mapa interactivo</h2>
+    <p>Filtra por tipo de punto y haz clic en cualquier marcador para ver detalles</p>
+  </div>
+  <div class="mapa-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Buscar colonia o punto..."/>
+      </div>
+      <div class="filtros">
+        <button class="filtro-btn active" data-tipo="todos"><i class="fa-solid fa-globe"></i><span>Todos</span></button>
+        <button class="filtro-btn" data-tipo="reciclaje"><i class="fa-solid fa-recycle"></i><span>Acopio</span></button>
+        <button class="filtro-btn" data-tipo="ruta"><i class="fa-solid fa-truck"></i><span>Rutas</span></button>
+        <button class="filtro-btn" data-tipo="pilas"><i class="fa-solid fa-battery-half"></i><span>Pilas</span></button>
+        <button class="filtro-btn" data-tipo="tiradero"><i class="fa-solid fa-triangle-exclamation"></i><span>Tiraderos</span></button>
+      </div>
+      <div class="lista-puntos" id="listaPuntos">
+        <div class="lista-loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</div>
+      </div>
+    </div>
+    <!-- Mapa -->
+    <div class="mapa-wrap">
+      <div id="map"></div>
+      <div class="map-legend">
+        <div class="legend-item"><span class="ldot" style="background:#4A8C2A"></span>Acopio</div>
+        <div class="legend-item"><span class="ldot" style="background:#0F6E56"></span>Ruta</div>
+        <div class="legend-item"><span class="ldot" style="background:#BA7517"></span>Pilas</div>
+        <div class="legend-item"><span class="ldot" style="background:#A32D2D"></span>Tiradero</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RUTAS ───────────────────────────────────────────────── -->
+<section class="rutas-section" id="rutas">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-truck"></i> Rutas de recolección municipal</h2>
+    <p class="section-sub">Horario general: 7:00 am – 2:00 pm · Tel. reportes: <strong>933 136 3054</strong></p>
+
+    <div class="rutas-always">
+      <div class="ruta-always-badge"><i class="fa-solid fa-clock"></i> Todos los días</div>
+      <div class="ruta-always-grid">
+        <div class="ruta-always-item">
+          <i class="fa-solid fa-moon"></i>
+          <div><strong>Col. Centro</strong><span>7:00 pm – 2:00 am</span></div>
+        </div>
+        <div class="ruta-always-item">
+          <i class="fa-solid fa-sun"></i>
+          <div><strong>Blvd. Manuel Antonio Romero Zurita</strong><span>7:00 am – 2:00 pm</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rutas-tabs">
+      <button class="rtab active" data-rt="lmv"><i class="fa-solid fa-calendar-days"></i> Lunes · Miércoles · Viernes</button>
+      <button class="rtab" data-rt="mjs"><i class="fa-solid fa-calendar-days"></i> Martes · Jueves · Sábado</button>
+    </div>
+
+    <div class="rutas-grid" id="rutasGrid"></div>
+  </div>
+</section>
+
+<!-- ── REPORTAR ────────────────────────────────────────────── -->
+<section class="reportar-section" id="reportar">
+  <div class="section-inner">
+    <div class="reportar-header">
+      <h2><i class="fa-solid fa-camera"></i> Reportar tiradero clandestino</h2>
+      <p>¿Encontraste basura en manglares, lagunas o caminos de Paraíso? Tu reporte aparecerá en el mapa públicamente para que el municipio lo atienda.</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label><i class="fa-solid fa-user"></i> Tu nombre</label>
+          <input type="text" id="inp-nombre" placeholder="Anónimo"/>
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-map-pin"></i> Colonia o zona</label>
+          <input type="text" id="inp-colonia" placeholder="Ej. Col. Las Flores, Puerto Ceiba..."/>
+        </div>
+        <div class="form-group full">
+          <label><i class="fa-solid fa-comment"></i> Descripción del problema</label>
+          <textarea id="inp-desc" rows="3" placeholder="Tipo de residuos, tamaño del tiradero, si hay riesgo ambiental..."></textarea>
+        </div>
+        <!-- Foto desactivada: usa plan Blaze de Firebase o Cloudinary para habilitarla -->
+        <input type="file" id="inp-foto" class="hidden" accept="image/*"/>
+        <div id="previewFoto" class="hidden"></div>
+        <div class="form-group full">
+          <label><i class="fa-solid fa-location-crosshairs"></i> Ubicación GPS</label>
+          <div class="gps-row">
+            <button class="btn-gps" id="btnGPS"><i class="fa-solid fa-location-dot"></i> Obtener mi ubicación</button>
+            <span id="gpsStatus" class="gps-status"></span>
+          </div>
+          <div id="miniMap" class="mini-map hidden"></div>
+        </div>
+        <div class="form-group full">
+          <button class="btn-primary btn-full" id="btnEnviar"><i class="fa-solid fa-paper-plane"></i> Enviar reporte al mapa</button>
+          <div id="msgEnvio" class="msg-envio hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GUÍA ────────────────────────────────────────────────── -->
+<section class="guia-section" id="guia">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-recycle"></i> Guía de reciclaje</h2>
+    <p class="section-sub">¿Cómo preparo mis residuos antes de llevarlos al punto de acopio?</p>
+
+    <div class="guia-buscador">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="guiaBuscar" placeholder="Buscar material... (pila, botella, cartón...)"/>
+    </div>
+
+    <div class="guia-grid" id="guiaGrid"></div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo"><i class="fa-solid fa-leaf"></i> EcoMapa Paraíso</div>
+    <p>Proyecto universitario · Paraíso, Tabasco · 2026</p>
+    <p>Tecnología al servicio de los manglares y la costa de Paraíso.</p>
+    <p class="footer-tel"><i class="fa-solid fa-phone"></i> Reportes municipales: <strong>933 136 3054</strong></p>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="firebase-config.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
