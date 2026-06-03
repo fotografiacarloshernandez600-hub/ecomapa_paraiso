@@ -1,6 +1,6 @@
 import { db } from "./firebase-config.js";
 import {
-  collection, addDoc, onSnapshot, serverTimestamp
+  collection, addDoc, onSnapshot, serverTimestamp, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── DATOS REALES ──────────────────────────────────────────────
@@ -430,18 +430,16 @@ document.querySelectorAll(".guia-card,.ruta-card,.punto-item").forEach(el=>{
 
 // ── AVISOS MUNICIPALES EN TIEMPO REAL ────────────────────────
 const AVISO_CFG = {
-  info:       { icon:"fa-circle-info",         clase:"aviso-info" },
+  info:       { icon:"fa-circle-info",          clase:"aviso-info" },
   alerta:     { icon:"fa-triangle-exclamation", clase:"aviso-alerta" },
-  suspension: { icon:"fa-truck",               clase:"aviso-suspension" },
-  nuevo:      { icon:"fa-circle-check",        clase:"aviso-nuevo" },
+  suspension: { icon:"fa-truck",                clase:"aviso-suspension" },
+  nuevo:      { icon:"fa-circle-check",         clase:"aviso-nuevo" },
 };
 
-onSnapshot(collection(db, "avisos"), (snap) => {
+function renderAvisosPublic(avisos) {
   const lista = document.getElementById("avisosPublicList");
   const count = document.getElementById("avisosCount");
   if (!lista) return;
-
-  const avisos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   if (!avisos.length) {
     lista.innerHTML = `<div class="avisos-empty"><i class="fa-solid fa-check-circle"></i> Sin avisos activos por el momento</div>`;
@@ -466,4 +464,10 @@ onSnapshot(collection(db, "avisos"), (snap) => {
       </div>
     </div>`;
   }).join("");
+}
+
+// Escuchar cambios en tiempo real
+onSnapshot(collection(db, "avisos"), (snap) => {
+  const avisos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderAvisosPublic(avisos);
 });
