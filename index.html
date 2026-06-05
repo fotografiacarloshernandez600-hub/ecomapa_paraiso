@@ -290,11 +290,35 @@
 <section class="pledges-section" id="pledges">
   <div class="section-inner">
     <h2><i class="fa-solid fa-handshake-angle"></i> Compromisos ecológicos</h2>
-    <p class="section-sub">Firma un compromiso y súmate a los ciudadanos de Paraíso que ya están actuando.</p>
-    <div class="pledges-grid" id="pledgesGrid"></div>
-    <div class="pledge-contador">
-      <div class="pledge-total" id="pledgeTotal">0</div>
-      <div class="pledge-total-lbl">compromisos firmados en Paraíso</div>
+    <p class="section-sub">Firma compromisos, acumula puntos y súmate al ranking de ciudadanos de Paraíso que ya están actuando.</p>
+
+    <!-- Registro de nombre -->
+    <div class="pledge-registro" id="pledgeRegistro">
+      <div class="pledge-reg-icon">🌿</div>
+      <h3>¿Cómo te llamas?</h3>
+      <p>Tu nombre aparecerá en el ranking público de Paraíso.</p>
+      <div class="pledge-reg-form">
+        <input type="text" id="pledgeNombre" placeholder="Tu nombre o apodo" maxlength="30"/>
+        <button class="btn-primary" id="btnRegistroPledge"><i class="fa-solid fa-check"></i> Confirmar</button>
+      </div>
+    </div>
+
+    <!-- Compromisos -->
+    <div class="pledges-content hidden" id="pledgesContent">
+      <div class="pledge-user-card" id="pledgeUserCard"></div>
+      <div class="pledges-grid" id="pledgesGrid"></div>
+      <div class="pledge-contador">
+        <div class="pledge-total" id="pledgeTotal">0</div>
+        <div class="pledge-total-lbl">compromisos firmados en Paraíso</div>
+      </div>
+    </div>
+
+    <!-- Ranking -->
+    <div class="pledge-ranking-wrap">
+      <h3 class="pledge-ranking-title"><i class="fa-solid fa-trophy"></i> Ranking de guardianes de Paraíso</h3>
+      <div class="pledge-ranking" id="pledgeRanking">
+        <div class="lista-loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando ranking...</div>
+      </div>
     </div>
   </div>
 </section>
