@@ -484,3 +484,239 @@ function formatFecha(d) {
 const style = document.createElement("style");
 style.textContent = `.msg-envio{padding:.6rem .9rem;border-radius:8px;font-size:.82rem;text-align:center}.msg-exito{background:#EAF3DE;color:#27500A}.msg-error{background:#FCEBEB;color:#791F1F}`;
 document.head.appendChild(style);
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN v3.0 — JORNADAS, QUIZ, PLEDGES
+// ═══════════════════════════════════════════════════════════════
+
+// Agregar títulos nuevos al objeto TITULOS
+Object.assign(TITULOS || {}, {
+  jornadas: "Jornadas de limpieza",
+  quiz:     "Quiz / Modo escuela",
+  pledges:  "Compromisos ecológicos"
+});
+
+const PLEDGES_NOMBRES = {
+  p1:"Moverse en bicicleta 3 días/semana",
+  p2:"Separar basura todos los días",
+  p3:"No usar bolsas de plástico",
+  p4:"Ducha menor a 5 minutos",
+  p5:"Llevar pilas a punto de acopio",
+  p6:"Reportar 1 tiradero este mes",
+  p7:"Compartir EcoMapa con 5 personas",
+  p8:"Llevar aceite usado al DIF",
+};
+
+// ── JORNADAS ──────────────────────────────────────────────────
+let allJornadas = [];
+
+function escucharJornadas() {
+  onSnapshot(collection(db,"jornadas"), snap => {
+    allJornadas = snap.docs.map(d => ({ id:d.id, ...d.data() }))
+      .sort((a,b) => (a.fecha||"").localeCompare(b.fecha||""));
+    renderTablaJornadas();
+  });
+}
+
+function renderTablaJornadas() {
+  const tbody = document.getElementById("jornadasBody");
+  const empty = document.getElementById("jornadasEmpty");
+  if (!tbody) return;
+  if (!allJornadas.length) {
+    tbody.innerHTML = "";
+    empty?.classList.remove("hidden");
+    return;
+  }
+  empty?.classList.add("hidden");
+  tbody.innerHTML = allJornadas.map(j => `
+    <tr>
+      <td><strong>${j.nombre||"Sin nombre"}</strong></td>
+      <td>${j.colonia||"—"}</td>
+      <td>${j.fecha||"—"}</td>
+      <td>${j.hora||"—"}</td>
+      <td>${j.org||"Anónimo"}</td>
+      <td><span style="font-weight:700;color:#2C5F2D">${j.asistentes||0}</span> confirmados</td>
+      <td>
+        <button class="btn-accion btn-eliminar" onclick="eliminarJornada('${j.id}')">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </td>
+    </tr>`).join("");
+}
+
+window.eliminarJornada = async id => {
+  if (!confirm("¿Eliminar esta jornada?")) return;
+  await deleteDoc(doc(db,"jornadas",id));
+};
+
+document.getElementById("btnExportJornadas")?.addEventListener("click", () => {
+  const rows = [["Nombre","Colonia","Fecha","Hora","Organizador","Asistentes"]];
+  allJornadas.forEach(j => rows.push([j.nombre||"",j.colonia||"",j.fecha||"",j.hora||"",j.org||"",j.asistentes||0]));
+  const csv = rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download = `jornadas_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+});
+
+// ── QUIZ ──────────────────────────────────────────────────────
+let allQuiz = [];
+
+function escucharQuiz() {
+  onSnapshot(collection(db,"quiz_resultados"), snap => {
+    allQuiz = snap.docs.map(d => ({ id:d.id, ...d.data() }))
+      .sort((a,b) => b.puntos - a.puntos);
+    actualizarBadgeQuiz();
+    renderQuizStats();
+    renderTablaQuiz();
+    llenarFiltrosCodigos();
+  });
+}
+
+function actualizarBadgeQuiz() {
+  const b = document.getElementById("badgeQuiz");
+  if (b) { b.textContent = allQuiz.length; b.style.display = allQuiz.length?"flex":"none"; }
+}
+
+function renderQuizStats() {
+  const total = allQuiz.length;
+  const promedio = total ? (allQuiz.reduce((a,r)=>a+r.puntos,0)/total).toFixed(1) : 0;
+  const grupos = new Set(allQuiz.map(r=>r.codigo).filter(c=>c&&c!=="SIN_CODIGO")).size;
+  const perfectos = allQuiz.filter(r=>r.puntos===8).length;
+  setEl("qStatTotal",    total);
+  setEl("qStatPromedio", promedio+"/8");
+  setEl("qStatGrupos",   grupos);
+  setEl("qStatPerfecto", perfectos);
+}
+
+function renderTablaQuiz() {
+  const tbody = document.getElementById("quizBody");
+  const empty = document.getElementById("quizEmpty");
+  if (!tbody) return;
+  const filtCodigo = document.getElementById("filtroCodigoQuiz")?.value||"todos";
+  const buscar = (document.getElementById("buscarAlumno")?.value||"").toLowerCase();
+  let datos = allQuiz.filter(r => {
+    const codOk = filtCodigo==="todos"||(r.codigo||"")==filtCodigo;
+    const busqOk = !buscar||(r.nombre||"").toLowerCase().includes(buscar);
+    return codOk && busqOk;
+  });
+  if (!datos.length) { tbody.innerHTML=""; empty?.classList.remove("hidden"); return; }
+  empty?.classList.add("hidden");
+  tbody.innerHTML = datos.map((r,i) => {
+    const pct  = Math.round(r.puntos/8*100);
+    const cls  = r.puntos>=6?"color:#2C5F2D":r.puntos>=4?"color:#854F0B":"color:#A32D2D";
+    const emoji= r.puntos>=6?"🏆":r.puntos>=4?"👍":"📚";
+    const fecha= r.fecha?.toDate?r.fecha.toDate().toLocaleDateString("es-MX",{day:"2-digit",month:"short",year:"2-digit"}):"—";
+    const codigo = r.codigo&&r.codigo!=="SIN_CODIGO"
+      ? `<span style="background:#EAF3DE;color:#27500A;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:600">${r.codigo}</span>`
+      : `<span style="color:#aaa;font-size:.75rem">Sin código</span>`;
+    return `<tr>
+      <td><strong>${r.nombre||"Anónimo"}</strong></td>
+      <td>${codigo}</td>
+      <td><span style="font-size:1.1rem;font-weight:800;${cls}">${r.puntos}</span><span style="color:#aaa;font-size:.75rem">/8</span>
+        <div style="height:4px;background:#e0ebd4;border-radius:999px;overflow:hidden;width:60px;margin-top:3px">
+          <div style="height:100%;width:${pct}%;background:#4A8C2A;border-radius:999px"></div>
+        </div>
+      </td>
+      <td>${emoji} ${r.puntos>=6?"Excelente":r.puntos>=4?"Bien":"Necesita repasar"}</td>
+      <td style="color:#aaa;font-size:.75rem">${fecha}</td>
+    </tr>`;
+  }).join("");
+}
+
+function llenarFiltrosCodigos() {
+  const sel = document.getElementById("filtroCodigoQuiz");
+  if (!sel) return;
+  const codigos = [...new Set(allQuiz.map(r=>r.codigo).filter(c=>c&&c!=="SIN_CODIGO"))];
+  const actual = sel.value;
+  sel.innerHTML = `<option value="todos">Todos los grupos</option>`
+    + codigos.map(c=>`<option value="${c}" ${actual===c?"selected":""}>${c}</option>`).join("");
+}
+
+document.getElementById("filtroCodigoQuiz")?.addEventListener("change", renderTablaQuiz);
+document.getElementById("buscarAlumno")?.addEventListener("input", renderTablaQuiz);
+
+document.getElementById("btnExportQuiz")?.addEventListener("click", () => {
+  const rows = [["Nombre","Codigo","Puntos","Porcentaje","Resultado","Fecha"]];
+  allQuiz.forEach(r => rows.push([
+    r.nombre||"Anonimo", r.codigo||"SIN_CODIGO", r.puntos+"/8",
+    Math.round(r.puntos/8*100)+"%",
+    r.puntos>=6?"Excelente":r.puntos>=4?"Bien":"Necesita repasar",
+    r.fecha?.toDate?r.fecha.toDate().toLocaleDateString("es-MX"):""
+  ]));
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download=`quiz_resultados_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+});
+
+// ── PLEDGES ───────────────────────────────────────────────────
+let allPledgesAdmin = [];
+
+function escucharPledgesAdmin() {
+  onSnapshot(collection(db,"pledges"), snap => {
+    allPledgesAdmin = snap.docs.map(d => d.data());
+    renderPledgesAdmin();
+  });
+}
+
+function renderPledgesAdmin() {
+  const total = allPledgesAdmin.length;
+  setEl("pStatTotal", total);
+
+  // Contar por tipo
+  const conteo = {};
+  allPledgesAdmin.forEach(p => { conteo[p.pledgeId]=(conteo[p.pledgeId]||0)+1; });
+  const sorted = Object.entries(conteo).sort((a,b)=>b[1]-a[1]);
+  if (sorted.length) setEl("pStatPopular", sorted[0][1]+" firmas");
+
+  const cont = document.getElementById("pledgesBarras");
+  if (!cont) return;
+  const max = sorted[0]?.[1]||1;
+  cont.innerHTML = sorted.length
+    ? sorted.map(([id,n]) => `
+      <div style="margin-bottom:.85rem">
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px">
+          <span style="color:#333">${PLEDGES_NOMBRES[id]||id}</span>
+          <span style="color:#2C5F2D;font-weight:700">${n} firma${n!==1?"s":""}</span>
+        </div>
+        <div style="height:6px;background:#e8f0e0;border-radius:999px;overflow:hidden">
+          <div style="height:100%;width:${Math.round(n/max*100)}%;background:#4A8C2A;border-radius:999px"></div>
+        </div>
+      </div>`).join("")
+    : `<p style="color:#aaa;text-align:center;padding:2rem">No hay compromisos firmados aún</p>`;
+
+  document.getElementById("btnExportPledges")?.removeEventListener("click",exportPledges);
+  document.getElementById("btnExportPledges")?.addEventListener("click", exportPledges);
+}
+
+function exportPledges() {
+  const rows=[["Compromiso","Firmas"]];
+  const conteo={};
+  allPledgesAdmin.forEach(p=>{conteo[p.pledgeId]=(conteo[p.pledgeId]||0)+1;});
+  Object.entries(conteo).sort((a,b)=>b[1]-a[1]).forEach(([id,n])=>rows.push([PLEDGES_NOMBRES[id]||id,n]));
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download=`pledges_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ── ARRANCAR NUEVOS MÓDULOS ───────────────────────────────────
+const _origInit = initDashboard;
+function initDashboard() {
+  escucharReportes();
+  escucharAvisos();
+  renderPuntos();
+  escucharJornadas();
+  escucharQuiz();
+  escucharPledgesAdmin();
+}
+
+// Llamar initDashboard de nuevo si ya se había llamado (auth ya activa)
+if (document.getElementById("dashboard") && !document.getElementById("dashboard").classList.contains("hidden")) {
+  escucharJornadas();
+  escucharQuiz();
+  escucharPledgesAdmin();
+}
