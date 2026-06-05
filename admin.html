@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<!-- ── LOGIN ──────────────────────────────────────────────────── -->
+<!-- ── LOGIN ─────────────────────────────────────────────────── -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
     <div class="login-logo">
@@ -38,7 +38,7 @@
   </div>
 </div>
 
-<!-- ── DASHBOARD ──────────────────────────────────────────────── -->
+<!-- ── DASHBOARD ─────────────────────────────────────────────── -->
 <div id="dashboard" class="dashboard hidden">
 
   <!-- Sidebar -->
@@ -85,7 +85,7 @@
 
     <div class="view-area">
 
-      <!-- ── RESUMEN ──────────────────────────────────────────── -->
+      <!-- ── RESUMEN ────────────────────────────────────────── -->
       <div class="view active" id="view-resumen">
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-map-pin"></i></div><div class="stat-body"><div class="stat-n" id="statPuntos">5</div><div class="stat-l">Centros de acopio</div></div></div>
@@ -93,7 +93,6 @@
           <div class="stat-card"><div class="stat-icon teal"><i class="fa-solid fa-check-circle"></i></div><div class="stat-body"><div class="stat-n" id="statResueltos">0</div><div class="stat-l">Reportes resueltos</div></div></div>
           <div class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-users"></i></div><div class="stat-body"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Total de reportes</div></div></div>
         </div>
-
         <div class="row2">
           <div class="panel">
             <div class="panel-header"><h3><i class="fa-solid fa-clock-rotate-left"></i> Reportes recientes</h3></div>
@@ -106,7 +105,7 @@
         </div>
       </div>
 
-      <!-- ── REPORTES ─────────────────────────────────────────── -->
+      <!-- ── REPORTES ──────────────────────────────────────── -->
       <div class="view" id="view-reportes">
         <div class="view-toolbar">
           <div class="toolbar-left">
@@ -123,10 +122,7 @@
         <div class="reportes-table-wrap">
           <table class="reportes-table" id="reportesTable">
             <thead>
-              <tr>
-                <th>Foto</th><th>Colonia / Zona</th><th>Descripción</th>
-                <th>Ciudadano</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
-              </tr>
+              <tr><th>Foto</th><th>Colonia / Zona</th><th>Descripción</th><th>Ciudadano</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
             </thead>
             <tbody id="reportesBody"></tbody>
           </table>
@@ -134,15 +130,13 @@
         </div>
       </div>
 
-      <!-- ── PUNTOS ───────────────────────────────────────────── -->
+      <!-- ── PUNTOS ────────────────────────────────────────── -->
       <div class="view" id="view-puntos">
         <div class="view-toolbar">
           <span class="toolbar-info"><i class="fa-solid fa-info-circle"></i> Estos puntos aparecen en el mapa público</span>
           <button class="btn-primary" id="btnNuevoPunto"><i class="fa-solid fa-plus"></i> Agregar centro</button>
         </div>
         <div class="puntos-grid" id="puntosGrid"></div>
-
-        <!-- Modal nuevo punto -->
         <div class="modal-overlay hidden" id="modalPunto">
           <div class="modal">
             <div class="modal-header">
@@ -172,7 +166,7 @@
         </div>
       </div>
 
-      <!-- ── AVISOS ───────────────────────────────────────────── -->
+      <!-- ── AVISOS ────────────────────────────────────────── -->
       <div class="view" id="view-avisos">
         <div class="row2">
           <div class="panel">
@@ -200,7 +194,7 @@
         </div>
       </div>
 
-      <!-- ── ESTADÍSTICAS ─────────────────────────────────────── -->
+      <!-- ── ESTADÍSTICAS ──────────────────────────────────── -->
       <div class="view" id="view-estadisticas">
         <div class="stats-grid" style="margin-bottom:1.5rem">
           <div class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-calendar-week"></i></div><div class="stat-body"><div class="stat-n" id="statSemana">0</div><div class="stat-l">Esta semana</div></div></div>
@@ -212,7 +206,9 @@
           <div class="panel"><div class="panel-header"><h3><i class="fa-solid fa-chart-bar"></i> Reportes por mes</h3></div><div class="chart-wrap"><canvas id="chartBar"></canvas></div></div>
           <div class="panel"><div class="panel-header"><h3><i class="fa-solid fa-map-location-dot"></i> Top colonias con más reportes</h3></div><div id="topColonias" class="top-list"></div></div>
         </div>
-      <!-- ── JORNADAS ADMIN ────────────────────────────────── -->
+      </div>
+
+      <!-- ── JORNADAS ──────────────────────────────────────── -->
       <div class="view" id="view-jornadas">
         <div class="view-toolbar">
           <span class="toolbar-info"><i class="fa-solid fa-info-circle"></i> Jornadas convocadas por ciudadanos</span>
@@ -227,7 +223,7 @@
         </div>
       </div>
 
-      <!-- ── QUIZ ADMIN ─────────────────────────────────────── -->
+      <!-- ── QUIZ ──────────────────────────────────────────── -->
       <div class="view" id="view-quiz">
         <div class="view-toolbar">
           <div class="toolbar-left">
@@ -251,7 +247,7 @@
         </div>
       </div>
 
-      <!-- ── PLEDGES ADMIN ──────────────────────────────────── -->
+      <!-- ── PLEDGES ────────────────────────────────────────── -->
       <div class="view" id="view-pledges">
         <div class="view-toolbar">
           <span class="toolbar-info"><i class="fa-solid fa-info-circle"></i> Compromisos ecológicos firmados por ciudadanos</span>
@@ -262,8 +258,6 @@
           <div class="stat-card"><div class="stat-icon teal"><i class="fa-solid fa-star"></i></div><div class="stat-body"><div class="stat-n" id="pStatPopular">—</div><div class="stat-l">Compromiso más firmado</div></div></div>
         </div>
         <div id="pledgesBarras" style="background:#fff;border-radius:12px;border:1px solid #e4e4e0;padding:1.25rem"></div>
-      </div>
-
       </div>
 
     </div>
