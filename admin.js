@@ -129,6 +129,9 @@ function initDashboard() {
   escucharReportes();
   escucharAvisos();
   renderPuntos();
+  escucharJornadas();
+  escucharQuiz();
+  escucharPledgesAdmin();
 }
 
 // ── REPORTES – TIEMPO REAL ────────────────────────────────────
@@ -702,19 +705,9 @@ function exportPledges() {
 }
 
 // ── ARRANCAR NUEVOS MÓDULOS ───────────────────────────────────
-const _origInit = initDashboard;
-function initDashboard() {
-  escucharReportes();
-  escucharAvisos();
-  renderPuntos();
-  escucharJornadas();
-  escucharQuiz();
-  escucharPledgesAdmin();
-}
-
-// Llamar initDashboard de nuevo si ya se había llamado (auth ya activa)
-if (document.getElementById("dashboard") && !document.getElementById("dashboard").classList.contains("hidden")) {
-  escucharJornadas();
-  escucharQuiz();
-  escucharPledgesAdmin();
-}
+// Los nuevos módulos se llaman desde initDashboard original
+// que ya fue reemplazada — solo nos aseguramos que se escuchen
+document.addEventListener("DOMContentLoaded", () => {
+  // escucharJornadas, escucharQuiz y escucharPledgesAdmin
+  // se llaman dentro de initDashboard() una vez que el usuario inicia sesión
+});
