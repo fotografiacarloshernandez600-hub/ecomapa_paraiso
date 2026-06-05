@@ -56,6 +56,9 @@
       <button class="sb-item" data-view="puntos"><i class="fa-solid fa-map-pin"></i><span>Centros de acopio</span></button>
       <button class="sb-item" data-view="avisos"><i class="fa-solid fa-bell"></i><span>Avisos municipales</span></button>
       <button class="sb-item" data-view="estadisticas"><i class="fa-solid fa-chart-bar"></i><span>Estadísticas</span></button>
+      <button class="sb-item" data-view="jornadas"><i class="fa-solid fa-users"></i><span>Jornadas</span></button>
+      <button class="sb-item" data-view="quiz"><i class="fa-solid fa-brain"></i><span>Quiz / Escuela</span><span class="sb-badge" id="badgeQuiz">0</span></button>
+      <button class="sb-item" data-view="pledges"><i class="fa-solid fa-handshake-angle"></i><span>Compromisos</span></button>
     </nav>
     <div class="sb-footer">
       <div class="sb-user">
@@ -209,6 +212,58 @@
           <div class="panel"><div class="panel-header"><h3><i class="fa-solid fa-chart-bar"></i> Reportes por mes</h3></div><div class="chart-wrap"><canvas id="chartBar"></canvas></div></div>
           <div class="panel"><div class="panel-header"><h3><i class="fa-solid fa-map-location-dot"></i> Top colonias con más reportes</h3></div><div id="topColonias" class="top-list"></div></div>
         </div>
+      <!-- ── JORNADAS ADMIN ────────────────────────────────── -->
+      <div class="view" id="view-jornadas">
+        <div class="view-toolbar">
+          <span class="toolbar-info"><i class="fa-solid fa-info-circle"></i> Jornadas convocadas por ciudadanos</span>
+          <button class="btn-export" id="btnExportJornadas"><i class="fa-solid fa-download"></i> Exportar CSV</button>
+        </div>
+        <div class="reportes-table-wrap">
+          <table class="reportes-table">
+            <thead><tr><th>Jornada</th><th>Colonia</th><th>Fecha</th><th>Hora</th><th>Organizador</th><th>Asistentes</th><th>Acción</th></tr></thead>
+            <tbody id="jornadasBody"></tbody>
+          </table>
+          <div class="table-empty hidden" id="jornadasEmpty"><i class="fa-solid fa-inbox"></i><span>No hay jornadas registradas</span></div>
+        </div>
+      </div>
+
+      <!-- ── QUIZ ADMIN ─────────────────────────────────────── -->
+      <div class="view" id="view-quiz">
+        <div class="view-toolbar">
+          <div class="toolbar-left">
+            <select id="filtroCodigoQuiz" class="sel"><option value="todos">Todos los grupos</option></select>
+            <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="buscarAlumno" placeholder="Buscar alumno..."/></div>
+          </div>
+          <button class="btn-export" id="btnExportQuiz"><i class="fa-solid fa-download"></i> Exportar CSV</button>
+        </div>
+        <div class="stats-grid" style="margin-bottom:1rem">
+          <div class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-users"></i></div><div class="stat-body"><div class="stat-n" id="qStatTotal">0</div><div class="stat-l">Participantes totales</div></div></div>
+          <div class="stat-card"><div class="stat-icon teal"><i class="fa-solid fa-star"></i></div><div class="stat-body"><div class="stat-n" id="qStatPromedio">0</div><div class="stat-l">Promedio general</div></div></div>
+          <div class="stat-card"><div class="stat-icon amber"><i class="fa-solid fa-school"></i></div><div class="stat-body"><div class="stat-n" id="qStatGrupos">0</div><div class="stat-l">Grupos / clases</div></div></div>
+          <div class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-trophy"></i></div><div class="stat-body"><div class="stat-n" id="qStatPerfecto">0</div><div class="stat-l">Puntaje perfecto 8/8</div></div></div>
+        </div>
+        <div class="reportes-table-wrap">
+          <table class="reportes-table">
+            <thead><tr><th>Alumno</th><th>Código de clase</th><th>Puntaje</th><th>Resultado</th><th>Fecha</th></tr></thead>
+            <tbody id="quizBody"></tbody>
+          </table>
+          <div class="table-empty hidden" id="quizEmpty"><i class="fa-solid fa-inbox"></i><span>No hay resultados de quiz aún</span></div>
+        </div>
+      </div>
+
+      <!-- ── PLEDGES ADMIN ──────────────────────────────────── -->
+      <div class="view" id="view-pledges">
+        <div class="view-toolbar">
+          <span class="toolbar-info"><i class="fa-solid fa-info-circle"></i> Compromisos ecológicos firmados por ciudadanos</span>
+          <button class="btn-export" id="btnExportPledges"><i class="fa-solid fa-download"></i> Exportar CSV</button>
+        </div>
+        <div class="stats-grid" style="margin-bottom:1rem">
+          <div class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-handshake-angle"></i></div><div class="stat-body"><div class="stat-n" id="pStatTotal">0</div><div class="stat-l">Compromisos totales</div></div></div>
+          <div class="stat-card"><div class="stat-icon teal"><i class="fa-solid fa-star"></i></div><div class="stat-body"><div class="stat-n" id="pStatPopular">—</div><div class="stat-l">Compromiso más firmado</div></div></div>
+        </div>
+        <div id="pledgesBarras" style="background:#fff;border-radius:12px;border:1px solid #e4e4e0;padding:1.25rem"></div>
+      </div>
+
       </div>
 
     </div>
