@@ -32,6 +32,7 @@
     <a href="#rutas" class="nav-link"><i class="fa-solid fa-truck"></i><span>Rutas</span></a>
     <a href="#reportar" class="nav-link"><i class="fa-solid fa-camera"></i><span>Reportar</span></a>
     <a href="#guia" class="nav-link"><i class="fa-solid fa-recycle"></i><span>Guía</span></a>
+    <a href="#jornadas" class="nav-link"><i class="fa-solid fa-users"></i><span>Jornadas</span></a>
     <a href="#quiz" class="nav-link"><i class="fa-solid fa-brain"></i><span>Quiz</span></a>
     <a href="#concientiza" class="nav-link"><i class="fa-solid fa-globe"></i><span>Impacto</span></a>
     <a href="#avisos" class="nav-link"><i class="fa-solid fa-bullhorn"></i><span>Avisos</span></a>
@@ -74,6 +75,20 @@
   </div>
 </section>
 
+
+<!-- ── FEED DE ACCIONES EN VIVO ──────────────────────────────── -->
+<section class="feed-section" id="feed">
+  <div class="feed-inner">
+    <div class="feed-header">
+      <div class="feed-title"><span class="feed-dot"></span> Acciones ciudadanas en vivo</div>
+      <span class="feed-sub">Paraíso actuando ahora mismo</span>
+    </div>
+    <div class="feed-scroll" id="feedScroll">
+      <div class="feed-loading"><i class="fa-solid fa-spinner fa-spin"></i> Conectando...</div>
+    </div>
+  </div>
+</section>
+
 <!-- ── MAPA ────────────────────────────────────────────────── -->
 <section class="mapa-section" id="mapa">
   <div class="mapa-header">
@@ -106,6 +121,36 @@
         <div class="legend-item"><span class="ldot" style="background:#0F6E56"></span>Ruta</div>
         <div class="legend-item"><span class="ldot" style="background:#BA7517"></span>Pilas</div>
         <div class="legend-item"><span class="ldot" style="background:#A32D2D"></span>Tiradero</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── JORNADAS DE LIMPIEZA ──────────────────────────────────── -->
+<section class="jornadas-section" id="jornadas">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-users"></i> Jornadas de limpieza</h2>
+    <p class="section-sub">Organiza o únete a una jornada en tu colonia. Entre más seamos, mayor el impacto.</p>
+    <div class="jornadas-layout">
+      <div class="jornada-form-panel">
+        <h3><i class="fa-solid fa-plus"></i> Convocar jornada</h3>
+        <div class="jform">
+          <div class="field-group"><label>Nombre de la jornada</label><input type="text" id="jNombre" placeholder="Ej. Limpieza playa El Escribano"/></div>
+          <div class="field-group"><label>Colonia / Zona</label><input type="text" id="jColonia" placeholder="Col. Centro, Puerto Ceiba..."/></div>
+          <div class="field-group"><label>Fecha</label><input type="date" id="jFecha"/></div>
+          <div class="field-group"><label>Hora</label><input type="time" id="jHora"/></div>
+          <div class="field-group full"><label>Punto de reunión</label><input type="text" id="jPunto" placeholder="Frente al parque, entrada de la playa..."/></div>
+          <div class="field-group full"><label>Organizador</label><input type="text" id="jOrg" placeholder="Tu nombre o grupo"/></div>
+          <button class="btn-primary btn-full" id="btnCrearJornada"><i class="fa-solid fa-bullhorn"></i> Publicar jornada</button>
+          <div id="jornadaMsg" class="msg-envio hidden"></div>
+        </div>
+      </div>
+      <div class="jornadas-lista-panel">
+        <h3><i class="fa-solid fa-calendar-days"></i> Próximas jornadas</h3>
+        <div id="jornadasLista" class="jornadas-lista">
+          <div class="lista-loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</div>
+        </div>
       </div>
     </div>
   </div>
@@ -222,6 +267,20 @@
 </section>
 
 
+
+<!-- ── PLEDGES ECOLÓGICOS ────────────────────────────────────── -->
+<section class="pledges-section" id="pledges">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-handshake-angle"></i> Compromisos ecológicos</h2>
+    <p class="section-sub">Firma un compromiso y súmate a los ciudadanos de Paraíso que ya están actuando.</p>
+    <div class="pledges-grid" id="pledgesGrid"></div>
+    <div class="pledge-contador">
+      <div class="pledge-total" id="pledgeTotal">0</div>
+      <div class="pledge-total-lbl">compromisos firmados en Paraíso</div>
+    </div>
+  </div>
+</section>
+
 <!-- ── CONCIENTIZACIÓN ────────────────────────────────────────── -->
 <section class="concientiza-section" id="concientiza">
   <div class="section-inner">
@@ -279,6 +338,86 @@
       <div class="qr-box">
         <div id="qrCode"></div>
         <small>ecomapa-paraiso.vercel.app</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── CALCULADORA DE HUELLA ─────────────────────────────────── -->
+<section class="huella-section" id="huella">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-calculator"></i> Calcula tu huella ecológica</h2>
+    <p class="section-sub">Responde 5 preguntas y descubre cuánto CO₂ generas al mes comparado con el promedio de Paraíso.</p>
+    <div class="huella-layout">
+      <div class="huella-form" id="huellaForm">
+        <div class="huella-q" id="hq1">
+          <p class="hq-label">¿Cómo te transportas principalmente?</p>
+          <div class="hq-opts">
+            <label class="hq-opt"><input type="radio" name="h1" value="0"> A pie o bicicleta</label>
+            <label class="hq-opt"><input type="radio" name="h1" value="1.5"> Transporte público</label>
+            <label class="hq-opt"><input type="radio" name="h1" value="4"> Coche propio (gasolina)</label>
+            <label class="hq-opt"><input type="radio" name="h1" value="6"> Moto</label>
+          </div>
+        </div>
+        <div class="huella-q" id="hq2">
+          <p class="hq-label">¿Cuántas bolsas de plástico usas a la semana?</p>
+          <div class="hq-opts">
+            <label class="hq-opt"><input type="radio" name="h2" value="0"> Ninguna, uso bolsa reutilizable</label>
+            <label class="hq-opt"><input type="radio" name="h2" value="0.5"> 1 a 3 bolsas</label>
+            <label class="hq-opt"><input type="radio" name="h2" value="1.5"> 4 a 10 bolsas</label>
+            <label class="hq-opt"><input type="radio" name="h2" value="3"> Más de 10 bolsas</label>
+          </div>
+        </div>
+        <div class="huella-q" id="hq3">
+          <p class="hq-label">¿Separas tu basura en casa?</p>
+          <div class="hq-opts">
+            <label class="hq-opt"><input type="radio" name="h3" value="0"> Sí, siempre separo todo</label>
+            <label class="hq-opt"><input type="radio" name="h3" value="1"> A veces, cuando me acuerdo</label>
+            <label class="hq-opt"><input type="radio" name="h3" value="2.5"> Casi nunca</label>
+            <label class="hq-opt"><input type="radio" name="h3" value="4"> No separo nada</label>
+          </div>
+        </div>
+        <div class="huella-q" id="hq4">
+          <p class="hq-label">¿Cuánto tiempo te duchas aproximadamente?</p>
+          <div class="hq-opts">
+            <label class="hq-opt"><input type="radio" name="h4" value="0"> Menos de 5 minutos</label>
+            <label class="hq-opt"><input type="radio" name="h4" value="1"> 5 a 10 minutos</label>
+            <label class="hq-opt"><input type="radio" name="h4" value="2"> 10 a 20 minutos</label>
+            <label class="hq-opt"><input type="radio" name="h4" value="3.5"> Más de 20 minutos</label>
+          </div>
+        </div>
+        <div class="huella-q" id="hq5">
+          <p class="hq-label">¿Con qué frecuencia comes carne de res?</p>
+          <div class="hq-opts">
+            <label class="hq-opt"><input type="radio" name="h5" value="0"> No como carne</label>
+            <label class="hq-opt"><input type="radio" name="h5" value="1"> 1 o 2 veces por semana</label>
+            <label class="hq-opt"><input type="radio" name="h5" value="3"> 3 a 5 veces por semana</label>
+            <label class="hq-opt"><input type="radio" name="h5" value="5"> Todos los días</label>
+          </div>
+        </div>
+        <button class="btn-primary btn-full" id="btnCalcular" style="margin-top:1rem"><i class="fa-solid fa-leaf"></i> Calcular mi huella</button>
+      </div>
+      <div class="huella-result hidden" id="huellaResult">
+        <div class="huella-score-wrap">
+          <div class="huella-score" id="huellaScore">0</div>
+          <div class="huella-score-lbl">kg CO₂ / mes</div>
+        </div>
+        <div class="huella-barra-wrap">
+          <div class="huella-barra-label">Tú</div>
+          <div class="huella-barra-bg"><div class="huella-barra-fill" id="huellaBarraTu"></div></div>
+          <div class="huella-barra-num" id="huellaNumTu"></div>
+        </div>
+        <div class="huella-barra-wrap">
+          <div class="huella-barra-label">Promedio Paraíso</div>
+          <div class="huella-barra-bg"><div class="huella-barra-fill" style="width:60%;background:#BA7517"></div></div>
+          <div class="huella-barra-num">180 kg</div>
+        </div>
+        <div class="huella-tips" id="huellaTips"></div>
+        <div class="huella-btns">
+          <button class="btn-primary" id="btnCompartirHuella"><i class="fa-brands fa-whatsapp"></i> Compartir resultado</button>
+          <button class="btn-outline" id="btnReiniciarHuella"><i class="fa-solid fa-rotate-left"></i> Recalcular</button>
+        </div>
       </div>
     </div>
   </div>
