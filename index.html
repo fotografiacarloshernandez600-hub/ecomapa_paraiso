@@ -32,6 +32,8 @@
     <a href="#rutas" class="nav-link"><i class="fa-solid fa-truck"></i><span>Rutas</span></a>
     <a href="#reportar" class="nav-link"><i class="fa-solid fa-camera"></i><span>Reportar</span></a>
     <a href="#guia" class="nav-link"><i class="fa-solid fa-recycle"></i><span>Guía</span></a>
+    <a href="#quiz" class="nav-link"><i class="fa-solid fa-brain"></i><span>Quiz</span></a>
+    <a href="#concientiza" class="nav-link"><i class="fa-solid fa-globe"></i><span>Impacto</span></a>
     <a href="#avisos" class="nav-link"><i class="fa-solid fa-bullhorn"></i><span>Avisos</span></a>
   </div>
   <a href="#reportar" class="nav-cta"><i class="fa-solid fa-triangle-exclamation"></i> Reportar tiradero</a>
@@ -42,7 +44,7 @@
   <div class="hero-bg"></div>
   <div class="hero-particles" id="particles"></div>
   <div class="hero-content">
-    <div class="hero-badge"><i class="fa-solid fa-leaf"></i> Proyecto ecológico digital · 2026</div>
+    <div class="hero-badge"><i class="fa-solid fa-leaf"></i> Proyecto ecológico digital · 2025</div>
     <h1>Encuentra dónde reciclar<br/><span class="hero-accent">en Paraíso, Tabasco</span></h1>
     <p>Mapa interactivo con centros de acopio, rutas de recolección y reportes ciudadanos en tiempo real. Gratuito, sin instalar nada.</p>
     <div class="hero-btns">
@@ -58,6 +60,17 @@
     <div class="hstat"><span class="hstat-n" data-target="60">0</span><small>colonias cubiertas</small></div>
     <div class="hstat-div"></div>
     <div class="hstat"><span>$0</span><small>costo para ti</small></div>
+  </div>
+
+  <!-- Contador de impacto en tiempo real -->
+  <div class="impacto-banner">
+    <div class="impacto-item"><i class="fa-solid fa-triangle-exclamation"></i><span id="impactoReportes">0</span><small>tiraderos reportados</small></div>
+    <div class="impacto-sep"></div>
+    <div class="impacto-item"><i class="fa-solid fa-check-circle"></i><span id="impactoResueltos">0</span><small>resueltos este mes</small></div>
+    <div class="impacto-sep"></div>
+    <div class="impacto-item"><i class="fa-solid fa-users"></i><span id="impactoColonias">0</span><small>colonias participaron</small></div>
+    <div class="impacto-sep"></div>
+    <div class="impacto-item"><i class="fa-solid fa-leaf"></i><span id="impactoKg">0</span><small>kg residuos evitados</small></div>
   </div>
 </section>
 
@@ -163,8 +176,32 @@
         <div class="form-group full">
           <button class="btn-primary btn-full" id="btnEnviar"><i class="fa-solid fa-paper-plane"></i> Enviar reporte al mapa</button>
           <div id="msgEnvio" class="msg-envio hidden"></div>
+          <button class="btn-wa-reporte hidden" id="btnWaReporte"><i class="fa-brands fa-whatsapp"></i> Compartir mi reporte por WhatsApp</button>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── QUIZ ECOLÓGICO ───────────────────────────────────────── -->
+<section class="quiz-section" id="quiz">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-brain"></i> Quiz ecológico</h2>
+    <p class="section-sub">¿Qué tanto sabes sobre reciclaje y medio ambiente en Paraíso? Pon a prueba tus conocimientos.</p>
+    <div class="quiz-card" id="quizCard">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+      <div class="quiz-num" id="quizNum">Pregunta 1 de 8</div>
+      <div class="quiz-pregunta" id="quizPregunta"></div>
+      <div class="quiz-opciones" id="quizOpciones"></div>
+      <div class="quiz-feedback hidden" id="quizFeedback"></div>
+      <button class="btn-primary quiz-next hidden" id="quizNext">Siguiente <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+    <div class="quiz-resultado hidden" id="quizResultado">
+      <div class="quiz-score" id="quizScore"></div>
+      <div class="quiz-msg" id="quizMsg"></div>
+      <button class="btn-primary" id="quizReiniciar"><i class="fa-solid fa-rotate-left"></i> Jugar de nuevo</button>
+      <button class="btn-outline" id="quizCompartir"><i class="fa-brands fa-whatsapp"></i> Compartir resultado</button>
     </div>
   </div>
 </section>
@@ -181,6 +218,69 @@
     </div>
 
     <div class="guia-grid" id="guiaGrid"></div>
+  </div>
+</section>
+
+
+<!-- ── CONCIENTIZACIÓN ────────────────────────────────────────── -->
+<section class="concientiza-section" id="concientiza">
+  <div class="section-inner">
+    <h2><i class="fa-solid fa-globe"></i> ¿Por qué importa en Paraíso?</h2>
+    <p class="section-sub">El municipio de Paraíso tiene ecosistemas únicos que dependen de nuestras acciones diarias.</p>
+    <div class="datos-grid">
+      <div class="dato-card dato-red">
+        <div class="dato-num">1L</div>
+        <div class="dato-titulo">de aceite contamina</div>
+        <div class="dato-sub">1,000,000 litros de agua potable</div>
+        <div class="dato-tip">Lleva tu aceite usado al DIF Municipal — Mié y Vie 9–13h</div>
+      </div>
+      <div class="dato-card dato-amber">
+        <div class="dato-num">450</div>
+        <div class="dato-titulo">años tarda en degradarse</div>
+        <div class="dato-sub">una botella de plástico PET en el mar</div>
+        <div class="dato-tip">Separa el plástico y llévalo a Chatarra.com o Chatarrera Mendoza</div>
+      </div>
+      <div class="dato-card dato-teal">
+        <div class="dato-num">70%</div>
+        <div class="dato-titulo">del oxígeno marino</div>
+        <div class="dato-sub">proviene de ecosistemas de manglar como los de Paraíso</div>
+        <div class="dato-tip">Reporta tiraderos en manglares — cada reporte cuenta</div>
+      </div>
+      <div class="dato-card dato-green">
+        <div class="dato-num">10kg</div>
+        <div class="dato-titulo">de CO₂ se evitan</div>
+        <div class="dato-sub">por cada kg de aluminio reciclado vs. producido nuevo</div>
+        <div class="dato-tip">Lleva latas y aluminio a cualquier chatarrera de Paraíso</div>
+      </div>
+      <div class="dato-card dato-blue">
+        <div class="dato-num">500+</div>
+        <div class="dato-titulo">especies en peligro</div>
+        <div class="dato-sub">habitan los manglares y lagunas del Golfo de México</div>
+        <div class="dato-tip">Conoce las zonas protegidas en el mapa interactivo</div>
+      </div>
+      <div class="dato-card dato-purple">
+        <div class="dato-num">80%</div>
+        <div class="dato-titulo">de la basura en playas</div>
+        <div class="dato-sub">viene de malos hábitos en zonas urbanas, no del mar</div>
+        <div class="dato-tip">Usa los puntos de reciclaje del mapa antes de tirar</div>
+      </div>
+    </div>
+
+    <!-- QR del mapa -->
+    <div class="qr-section">
+      <div class="qr-info">
+        <h3><i class="fa-solid fa-qrcode"></i> Comparte EcoMapa Paraíso</h3>
+        <p>Escanea o comparte este código QR para que más ciudadanos de Paraíso puedan reportar tiraderos y encontrar puntos de reciclaje.</p>
+        <div class="qr-btns">
+          <button class="btn-primary" id="btnDescargarQR"><i class="fa-solid fa-download"></i> Descargar QR</button>
+          <button class="btn-outline btn-wa" id="btnCompartirMapaWA"><i class="fa-brands fa-whatsapp"></i> Compartir por WhatsApp</button>
+        </div>
+      </div>
+      <div class="qr-box">
+        <div id="qrCode"></div>
+        <small>ecomapa-paraiso.vercel.app</small>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -202,7 +302,7 @@
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-logo"><i class="fa-solid fa-leaf"></i> EcoMapa Paraíso</div>
-    <p>Proyecto universitario · Paraíso, Tabasco · 2026</p>
+    <p>Proyecto universitario · Paraíso, Tabasco · 2025</p>
     <p>Tecnología al servicio de los manglares y la costa de Paraíso.</p>
     <p class="footer-tel"><i class="fa-solid fa-phone"></i> Reportes municipales: <strong>933 136 3054</strong></p>
   </div>
@@ -210,6 +310,8 @@
 
 <!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="app.js"></script>
 </body>
