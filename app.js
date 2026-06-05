@@ -1,6 +1,7 @@
 import { db } from "./firebase-config.js";
 import {
-  collection, addDoc, onSnapshot, serverTimestamp, getDocs
+  collection, addDoc, onSnapshot, serverTimestamp, getDocs,
+  doc, updateDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── DATOS REALES ──────────────────────────────────────────────
@@ -780,3 +781,289 @@ function setEl2(id, val) { const el = document.getElementById(id); if (el) el.in
 
 // Actualizar impacto cada vez que onSnapshot dispare
 setTimeout(actualizarImpacto, 2500);
+
+// ═══════════════════════════════════════════════════════════════
+// v3.0 — IMPACTO REAL
+// ═══════════════════════════════════════════════════════════════
+
+const URL_SITIO2 = "https://ecomapa-paraiso.vercel.app";
+
+// ── FEED DE ACCIONES EN VIVO ──────────────────────────────────
+const FEED_TIPOS = {
+  tiradero:  { icon:"fa-triangle-exclamation", verb:"reportó un tiradero en" },
+  jornada:   { icon:"fa-users",                verb:"convocó una jornada en" },
+  limpieza:  { icon:"fa-broom",                verb:"limpió un tiradero en" },
+  pledge:    { icon:"fa-handshake-angle",       verb:"firmó un compromiso ecológico" },
+  quiz:      { icon:"fa-brain",                verb:"completó el quiz con" },
+};
+
+let feedItems = [];
+
+function renderFeed() {
+  const cont = document.getElementById("feedScroll");
+  if (!cont || !feedItems.length) return;
+  const doubled = [...feedItems, ...feedItems];
+  cont.innerHTML = `<div class="feed-items">${
+    doubled.map(a => {
+      const t = FEED_TIPOS[a.tipo] || FEED_TIPOS.tiradero;
+      return `<div class="feed-item"><i class="fa-solid ${t.icon}" aria-hidden="true"></i><span>${a.quien||"Ciudadano"} ${t.verb} ${a.zona||"Paraíso"}</span></div>`;
+    }).join("")
+  }</div>`;
+}
+
+// Escuchar todas las acciones en tiempo real
+onSnapshot(collection(db, "acciones"), snap => {
+  feedItems = snap.docs.map(d => d.data()).slice(-20);
+  if (!feedItems.length) {
+    feedItems = [
+      { tipo:"tiradero", quien:"Ana R.",    zona:"Col. Las Flores" },
+      { tipo:"quiz",     quien:"Carlos M.", zona:"10/10 puntos" },
+      { tipo:"pledge",   quien:"Sofía T.",  zona:"" },
+      { tipo:"tiradero", quien:"Luis G.",   zona:"Puerto Ceiba" },
+    ];
+  }
+  renderFeed();
+});
+
+async function registrarAccion(tipo, quien, zona) {
+  try {
+    await addDoc(collection(db, "acciones"), { tipo, quien, zona, fecha: serverTimestamp() });
+  } catch(e) { console.log("Accion no registrada:", e.message); }
+}
+
+// ── JORNADAS DE LIMPIEZA ──────────────────────────────────────
+onSnapshot(collection(db, "jornadas"), snap => {
+  const lista = document.getElementById("jornadasLista");
+  if (!lista) return;
+  const jornadas = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    .filter(j => j.fecha >= new Date().toISOString().slice(0,10))
+    .sort((a,b) => a.fecha.localeCompare(b.fecha));
+
+  if (!jornadas.length) {
+    lista.innerHTML = `<p style="color:#7a9f6a;font-size:.85rem;text-align:center;padding:2rem 0">No hay jornadas próximas.<br>¡Sé el primero en convocar una!</p>`;
+    return;
+  }
+
+  lista.innerHTML = jornadas.map(j => `
+    <div class="jornada-card">
+      <div class="jornada-nombre">${j.nombre}</div>
+      <div class="jornada-meta">
+        <span class="jornada-tag"><i class="fa-solid fa-calendar" style="margin-right:3px"></i>${j.fecha}</span>
+        <span class="jornada-tag"><i class="fa-solid fa-clock" style="margin-right:3px"></i>${j.hora||""}</span>
+        <span class="jornada-tag"><i class="fa-solid fa-map-pin" style="margin-right:3px"></i>${j.colonia}</span>
+      </div>
+      <div class="jornada-punto"><i class="fa-solid fa-location-dot" style="margin-right:4px;color:#7ABF3A"></i>${j.punto||"Punto por confirmar"}</div>
+      <div class="jornada-actions">
+        <button class="btn-unirse" onclick="unirseJornada('${j.id}',this)">
+          <i class="fa-solid fa-user-plus"></i> Me uno (${j.asistentes||0})
+        </button>
+        <button class="btn-wa-jornada" onclick="compartirJornada('${j.nombre}','${j.fecha}','${j.colonia}','${j.punto||""}')">
+          <i class="fa-brands fa-whatsapp"></i>
+        </button>
+      </div>
+    </div>`).join("");
+});
+
+document.getElementById("btnCrearJornada")?.addEventListener("click", async () => {
+  const nombre  = document.getElementById("jNombre").value.trim();
+  const colonia = document.getElementById("jColonia").value.trim();
+  const fecha   = document.getElementById("jFecha").value;
+  const hora    = document.getElementById("jHora").value;
+  const punto   = document.getElementById("jPunto").value.trim();
+  const org     = document.getElementById("jOrg").value.trim() || "Ciudadano";
+  const msg     = document.getElementById("jornadaMsg");
+
+  if (!nombre || !colonia || !fecha) { showMsg2("jornadaMsg","Nombre, colonia y fecha son obligatorios.","error"); return; }
+
+  try {
+    await addDoc(collection(db,"jornadas"), { nombre, colonia, fecha, hora, punto, org, asistentes:1, creado:serverTimestamp() });
+    await registrarAccion("jornada", org, colonia);
+    showMsg2("jornadaMsg","✅ ¡Jornada publicada! Ya aparece en la lista.","exito");
+    ["jNombre","jColonia","jFecha","jHora","jPunto","jOrg"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+  } catch(e) { showMsg2("jornadaMsg","Error al publicar. Verifica tu conexión.","error"); }
+});
+
+window.unirseJornada = async (id, btn) => {
+  if (btn.classList.contains("joined")) return;
+  try {
+    const ref2 = doc(db,"jornadas",id);
+    const d = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await d.updateDoc(ref2, { asistentes: d.increment(1) });
+    btn.classList.add("joined");
+    btn.innerHTML = `<i class="fa-solid fa-check"></i> ¡Anotado!`;
+  } catch(e) { console.log(e); }
+};
+
+window.compartirJornada = (nombre, fecha, colonia, punto) => {
+  const msg = encodeURIComponent(`🌿 *Jornada de limpieza en Paraíso*\n📋 ${nombre}\n📅 ${fecha}\n📍 ${colonia}${punto?" — "+punto:""}\n\nÚnete en: ${URL_SITIO2}#jornadas\n\n_Vía EcoMapa Paraíso_`);
+  window.open("https://wa.me/?text="+msg,"_blank");
+};
+
+// ── PLEDGES ECOLÓGICOS ────────────────────────────────────────
+const PLEDGES_DATA = [
+  { id:"p1", icon:"🚲", text:"Me moveré en bicicleta o a pie al menos 3 días por semana" },
+  { id:"p2", icon:"♻️", text:"Separaré mi basura en orgánica e inorgánica todos los días" },
+  { id:"p3", icon:"🛍️", text:"No usaré bolsas de plástico de un solo uso" },
+  { id:"p4", icon:"💧", text:"Reduciré mi ducha a menos de 5 minutos" },
+  { id:"p5", icon:"🔋", text:"Llevaré mis pilas usadas a un punto de acopio" },
+  { id:"p6", icon:"📢", text:"Reportaré al menos 1 tiradero clandestino este mes" },
+  { id:"p7", icon:"🌿", text:"Compartiré EcoMapa con 5 personas de mi colonia" },
+  { id:"p8", icon:"🧴", text:"Llevaré mi aceite usado al DIF Municipal de Paraíso" },
+];
+
+let pledgesCounts = {};
+let pledgesFirmados = new Set(JSON.parse(localStorage.getItem("pledges_firmados")||"[]"));
+
+function renderPledges() {
+  const grid = document.getElementById("pledgesGrid");
+  if (!grid) return;
+  grid.innerHTML = PLEDGES_DATA.map(p => `
+    <div class="pledge-card ${pledgesFirmados.has(p.id)?"signed":""}" onclick="firmarPledge('${p.id}',this)">
+      <div class="pledge-icon">${p.icon}</div>
+      <div class="pledge-text">${p.text}</div>
+      <div class="pledge-count" id="pc-${p.id}">${pledgesCounts[p.id]||0} personas firmaron</div>
+      <div class="pledge-check"><i class="fa-solid fa-check-circle"></i> ¡Firmado por ti!</div>
+    </div>`).join("");
+}
+
+onSnapshot(collection(db,"pledges"), snap => {
+  pledgesCounts = {};
+  let total = 0;
+  snap.docs.forEach(d => { const data=d.data(); pledgesCounts[data.pledgeId]=(pledgesCounts[data.pledgeId]||0)+1; total++; });
+  animCounter("pledgeTotal", total);
+  renderPledges();
+  document.querySelectorAll(".pledge-count").forEach(el => {
+    const id = el.id.replace("pc-","");
+    el.textContent = (pledgesCounts[id]||0) + " personas firmaron";
+  });
+});
+
+window.firmarPledge = async (id, card) => {
+  if (pledgesFirmados.has(id)) return;
+  pledgesFirmados.add(id);
+  localStorage.setItem("pledges_firmados", JSON.stringify([...pledgesFirmados]));
+  card.classList.add("signed");
+  try {
+    await addDoc(collection(db,"pledges"), { pledgeId:id, fecha:serverTimestamp() });
+    await registrarAccion("pledge","Ciudadano","Paraíso");
+  } catch(e) { console.log(e); }
+};
+
+renderPledges();
+
+// ── CALCULADORA DE HUELLA ─────────────────────────────────────
+const PROMEDIO_PARAISO = 180;
+
+document.getElementById("btnCalcular")?.addEventListener("click", () => {
+  const vals = ["h1","h2","h3","h4","h5"].map(n => {
+    const el = document.querySelector(`input[name="${n}"]:checked`);
+    return el ? parseFloat(el.value) : null;
+  });
+  if (vals.some(v => v === null)) { alert("Por favor responde todas las preguntas."); return; }
+
+  const base = 80;
+  const total = Math.round(base + vals.reduce((a,b)=>a+b,0) * 10);
+  const pct = Math.min(Math.round(total / PROMEDIO_PARAISO * 100), 100);
+  const color = total < PROMEDIO_PARAISO ? "#4A8C2A" : total < PROMEDIO_PARAISO*1.5 ? "#BA7517" : "#A32D2D";
+
+  document.getElementById("huellaScore").textContent = total;
+  document.getElementById("huellaScore").style.color = color;
+  const barTu = document.getElementById("huellaBarraTu");
+  if (barTu) { barTu.style.width = pct+"%"; barTu.style.background = color; }
+  document.getElementById("huellaNumTu").textContent = total+" kg";
+
+  const tips = total < PROMEDIO_PARAISO
+    ? "🌿 ¡Excelente! Tu huella es menor al promedio de Paraíso. Sigue así y comparte tus hábitos con tu familia."
+    : total < PROMEDIO_PARAISO*1.5
+    ? "💡 Tu huella está cerca del promedio. Pequeños cambios como usar bolsa reutilizable y duchar menos tiempo marcan la diferencia."
+    : "⚠️ Tu huella es mayor al promedio de Paraíso. Te sugerimos empezar por separar tu basura y reducir el uso del coche.";
+
+  document.getElementById("huellaTips").textContent = tips;
+  document.getElementById("huellaForm").classList.add("hidden");
+  document.getElementById("huellaResult").classList.remove("hidden");
+});
+
+document.getElementById("btnReiniciarHuella")?.addEventListener("click", () => {
+  document.getElementById("huellaForm").classList.remove("hidden");
+  document.getElementById("huellaResult").classList.add("hidden");
+  document.querySelectorAll(".huella-form input[type=radio]").forEach(r => r.checked=false);
+});
+
+document.getElementById("btnCompartirHuella")?.addEventListener("click", () => {
+  const score = document.getElementById("huellaScore")?.textContent||"?";
+  const msg = encodeURIComponent(`🌿 Calculé mi huella ecológica con EcoMapa Paraíso: *${score} kg CO₂/mes*.\nEl promedio de Paraíso es 180 kg. ¿Y la tuya?\n👉 ${URL_SITIO2}#huella`);
+  window.open("https://wa.me/?text="+msg,"_blank");
+});
+
+// ── ALERTA DE CONTAMINACIÓN HOTSPOT ──────────────────────────
+function verificarHotspots() {
+  const grupos = {};
+  todosMarkers.filter(m=>m.datos.tipo==="tiradero").forEach(m=>{
+    const key = Math.round(m.datos.lat*100)+","+Math.round(m.datos.lng*100);
+    grupos[key] = (grupos[key]||[]);
+    grupos[key].push(m);
+  });
+  Object.values(grupos).forEach(lista => {
+    if (lista.length >= 3) {
+      const primero = lista[0];
+      const ya = document.querySelector(`.alerta-toast`);
+      if (!ya) {
+        const toast = document.createElement("div");
+        toast.className = "alerta-toast";
+        toast.innerHTML = `<strong>⚠️ Zona crítica detectada</strong><small>${primero.datos.colonia||"Zona de Paraíso"} — ${lista.length} reportes en este punto. El municipio fue notificado.</small>`;
+        document.body.appendChild(toast);
+        setTimeout(()=>toast.remove(),6000);
+      }
+    }
+  });
+}
+setTimeout(verificarHotspots, 4000);
+
+// ── MODO ESCUELA ──────────────────────────────────────────────
+function initModoEscuela() {
+  const navbar = document.querySelector(".nav-links");
+  if (!navbar) return;
+
+  const btn = document.createElement("a");
+  btn.href="#quiz";
+  btn.className="modo-escuela-btn nav-link";
+  btn.innerHTML=`<i class="fa-solid fa-school" aria-hidden="true"></i><span>Modo escuela</span>`;
+  btn.addEventListener("click", abrirModoEscuela);
+  navbar.appendChild(btn);
+
+  const modalBg = document.createElement("div");
+  modalBg.className="escuela-modal-bg";
+  modalBg.id="escuelaModal";
+  const codigo = "ECO-"+Math.random().toString(36).slice(2,6).toUpperCase();
+  modalBg.innerHTML=`
+    <div class="escuela-modal">
+      <h3><i class="fa-solid fa-school" style="color:#4A8C2A;margin-right:6px"></i> Modo escuela</h3>
+      <p>Comparte este código con tu grupo. Todos hacen el quiz con el mismo código para que el maestro vea los resultados.</p>
+      <div class="codigo-clase">${codigo}</div>
+      <button class="btn-primary" onclick="compartirModoEscuela('${codigo}')"><i class="fa-brands fa-whatsapp"></i> Compartir código al grupo</button>
+      <button class="escuela-close" onclick="document.getElementById('escuelaModal').classList.remove('open')">Cerrar</button>
+    </div>`;
+  document.body.appendChild(modalBg);
+}
+
+function abrirModoEscuela(e) {
+  e.preventDefault();
+  document.getElementById("escuelaModal")?.classList.add("open");
+}
+
+window.compartirModoEscuela = (codigo) => {
+  const msg = encodeURIComponent(`📚 *Quiz ecológico de EcoMapa Paraíso — Modo Escuela*\n\nCódigo de clase: *${codigo}*\n\nEntra al quiz con este código:\n👉 ${URL_SITIO2}#quiz\n\n_¡Vamos a ver quién sabe más sobre el medio ambiente de Paraíso!_`);
+  window.open("https://wa.me/?text="+msg,"_blank");
+};
+
+window.addEventListener("load", () => {
+  initModoEscuela();
+  renderFeed();
+});
+
+function showMsg2(id, txt, tipo) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent=txt; el.className=`msg-envio msg-${tipo}`; el.classList.remove("hidden");
+  setTimeout(()=>el.classList.add("hidden"),5000);
+}
