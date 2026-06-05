@@ -674,10 +674,23 @@ const PREGUNTAS = [
 
 let qActual = 0, qPuntos = 0, qRespondida = false;
 
+let quizNombreJugador = "";
+let quizCodigoClase = "";
+
 function iniciarQuiz() {
-  qActual = 0; qPuntos = 0; qRespondida = false;
+  // Mostrar pantalla de entrada, no el quiz directamente
+  document.getElementById("quizEntry")?.classList.remove("hidden");
+  document.getElementById("quizCard")?.classList.add("hidden");
   document.getElementById("quizResultado")?.classList.add("hidden");
+}
+
+function arrancarQuiz() {
+  qActual = 0; qPuntos = 0; qRespondida = false;
+  quizNombreJugador = document.getElementById("quizNombre")?.value.trim() || "Anónimo";
+  quizCodigoClase   = (document.getElementById("quizCodigo")?.value.trim() || "").toUpperCase();
+  document.getElementById("quizEntry")?.classList.add("hidden");
   document.getElementById("quizCard")?.classList.remove("hidden");
+  document.getElementById("quizResultado")?.classList.add("hidden");
   mostrarPregunta();
 }
 
@@ -732,6 +745,12 @@ window.responder = function(idx) {
   }
 };
 
+document.getElementById("btnEmpezarQuiz")?.addEventListener("click", arrancarQuiz);
+document.getElementById("quizCodigo")?.addEventListener("keydown", e => {
+  e.target.value = e.target.value.toUpperCase();
+  if (e.key === "Enter") arrancarQuiz();
+});
+
 document.getElementById("quizNext")?.addEventListener("click", () => {
   qActual++;
   if (qActual < PREGUNTAS.length) {
@@ -741,7 +760,7 @@ document.getElementById("quizNext")?.addEventListener("click", () => {
   }
 });
 
-function mostrarResultado() {
+async function mostrarResultado() {
   document.getElementById("quizCard")?.classList.add("hidden");
   const res = document.getElementById("quizResultado");
   if (!res) return;
@@ -750,6 +769,18 @@ function mostrarResultado() {
   const pct = Math.round((qPuntos / PREGUNTAS.length) * 100);
   const scoreEl = document.getElementById("quizScore");
   if (scoreEl) scoreEl.textContent = `${qPuntos}/${PREGUNTAS.length}`;
+
+  // Guardar en Firestore (con o sin código de clase)
+  try {
+    await addDoc(collection(db, "quiz_resultados"), {
+      nombre:  quizNombreJugador,
+      puntos:  qPuntos,
+      total:   PREGUNTAS.length,
+      codigo:  quizCodigoClase || "SIN_CODIGO",
+      fecha:   serverTimestamp(),
+    });
+    if (quizCodigoClase) await registrarAccion("quiz", quizNombreJugador, `${qPuntos}/${PREGUNTAS.length} pts`);
+  } catch(e) { console.log("Quiz no guardado:", e.message); }
 
   const msgs = [
     { min: 0,  msg: "¡Sigue aprendiendo! EcoMapa Paraíso te ayuda a conocer más sobre el cuidado ambiental de tu municipio. 🌱" },
@@ -1038,9 +1069,10 @@ function initModoEscuela() {
   modalBg.innerHTML=`
     <div class="escuela-modal">
       <h3><i class="fa-solid fa-school" style="color:#4A8C2A;margin-right:6px"></i> Modo escuela</h3>
-      <p>Comparte este código con tu grupo. Todos hacen el quiz con el mismo código para que el maestro vea los resultados.</p>
+      <p>Comparte este código con tu grupo. Cada alumno lo ingresa al empezar el quiz. Cuando todos terminen, entra al panel del maestro para ver los resultados.</p>
       <div class="codigo-clase">${codigo}</div>
       <button class="btn-primary" onclick="compartirModoEscuela('${codigo}')"><i class="fa-brands fa-whatsapp"></i> Compartir código al grupo</button>
+      <a href="escuela.html?codigo=${codigo}" target="_blank" class="btn-primary" style="margin-top:.5rem;background:#0F6E56;text-decoration:none"><i class="fa-solid fa-chart-bar"></i> Ver resultados del grupo</a>
       <button class="escuela-close" onclick="document.getElementById('escuelaModal').classList.remove('open')">Cerrar</button>
     </div>`;
   document.body.appendChild(modalBg);
