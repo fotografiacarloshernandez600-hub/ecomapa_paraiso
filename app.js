@@ -660,17 +660,59 @@ if (_origBtnEnviar) {
   }, { once: false });
 }
 
-// ── QUIZ ECOLÓGICO ────────────────────────────────────────────
-const PREGUNTAS = [
-  { p: "¿Cuántos litros de agua contamina 1 litro de aceite de cocina usado?", ops: ["100 litros","10,000 litros","1,000,000 litros","500 litros"], r: 2, exp: "¡Correcto! Un solo litro de aceite puede contaminar hasta un millón de litros de agua. Nunca lo tires por el drenaje." },
-  { p: "¿Cuánto tiempo tarda en degradarse una botella de plástico PET en el mar?", ops: ["50 años","100 años","450 años","1,000 años"], r: 2, exp: "Una botella PET tarda aproximadamente 450 años en degradarse. En Paraíso, estas botellas llegan a los manglares y lagunas." },
-  { p: "¿Qué porcentaje del oxígeno marino proviene de los ecosistemas de manglar?", ops: ["10%","70%","30%","50%"], r: 1, exp: "Los manglares producen el 70% del oxígeno marino. Los de Paraíso son vitales para el Golfo de México." },
-  { p: "¿A qué chatarrera de Paraíso puedes llevar tus pilas usadas?", ops: ["Ninguna, hay que tirarlas","Chatarra.com o Chatarrera Mendoza 1","Solo al basurero municipal","No existe opción en Paraíso"], r: 1, exp: "¡Exacto! Las pilas son residuos peligrosos. Chatarra.com (tel. 933 164 4112) y Chatarrera Mendoza 1 las reciben." },
-  { p: "¿Cuántos kg de CO₂ se evitan por cada kg de aluminio reciclado?", ops: ["2 kg CO₂","5 kg CO₂","10 kg CO₂","15 kg CO₂"], r: 2, exp: "Reciclar 1 kg de aluminio evita 10 kg de CO₂ vs. producir aluminio nuevo. Las latas que tiras tienen un gran impacto." },
-  { p: "¿En qué horario pasa el camión recolector por la Col. Centro de Paraíso?", ops: ["7 am – 2 pm","7 pm – 2 am","6 am – 12 pm","Lunes y miércoles solamente"], r: 1, exp: "El camión de la Col. Centro pasa todos los días de 7 pm a 2 am. ¡Consulta tu colonia en la sección de rutas!" },
-  { p: "¿Qué debes hacer con el plástico antes de llevarlo al punto de acopio?", ops: ["Nada, se entrega tal cual","Aplastarlo y enjuagarlo","Quemarlo para reducir volumen","Mezclarlo con residuos orgánicos"], r: 1, exp: "Correcto: enjuaga, aplasta y retira etiquetas. Esto facilita el reciclaje y reduce el espacio de transporte." },
-  { p: "¿Cuál es el teléfono municipal para reportar problemas ambientales en Paraíso?", ops: ["933 688 5861","933 164 4112","933 136 3054","800 000 0000"], r: 2, exp: "¡Exacto! El 933 136 3054 es el número de Protección Ambiental y Desarrollo Sustentable del municipio de Paraíso." },
+// ── QUIZ ECOLÓGICO — BANCO DE 30 PREGUNTAS ───────────────────
+const BANCO_PREGUNTAS = [
+  { p: "¿Cuántos litros de agua contamina 1 litro de aceite de cocina usado?", ops: ["100 litros","10,000 litros","1,000,000 litros","500 litros"], r: 2, exp: "Un solo litro de aceite puede contaminar hasta un millón de litros de agua. Nunca lo tires por el drenaje." },
+  { p: "¿Cuánto tiempo tarda en degradarse una botella de plástico PET en el mar?", ops: ["50 años","100 años","450 años","1,000 años"], r: 2, exp: "Una botella PET tarda aproximadamente 450 años en degradarse. En Paraíso llegan a los manglares y lagunas." },
+  { p: "¿Qué porcentaje del oxígeno marino proviene de los manglares?", ops: ["10%","70%","30%","50%"], r: 1, exp: "Los manglares producen el 70% del oxígeno marino. Los de Paraíso son vitales para el Golfo de México." },
+  { p: "¿A qué chatarrera de Paraíso puedes llevar tus pilas usadas?", ops: ["Ninguna, hay que tirarlas","Chatarra.com o Chatarrera Mendoza 1","Solo al basurero municipal","No existe opción en Paraíso"], r: 1, exp: "Las pilas son residuos peligrosos. Chatarra.com (tel. 933 164 4112) y Chatarrera Mendoza 1 las reciben." },
+  { p: "¿Cuántos kg de CO₂ se evitan por cada kg de aluminio reciclado?", ops: ["2 kg CO₂","5 kg CO₂","10 kg CO₂","15 kg CO₂"], r: 2, exp: "Reciclar 1 kg de aluminio evita 10 kg de CO₂ vs. producir aluminio nuevo. ¡Las latas importan!" },
+  { p: "¿En qué horario pasa el camión recolector por la Col. Centro de Paraíso?", ops: ["7 am – 2 pm","7 pm – 2 am","6 am – 12 pm","Lunes y miércoles solamente"], r: 1, exp: "El camión de la Col. Centro pasa todos los días de 7 pm a 2 am." },
+  { p: "¿Qué debes hacer con el plástico antes de llevarlo al punto de acopio?", ops: ["Nada, se entrega tal cual","Aplastarlo y enjuagarlo","Quemarlo para reducir volumen","Mezclarlo con residuos orgánicos"], r: 1, exp: "Enjuaga, aplasta y retira etiquetas. Facilita el reciclaje y reduce el espacio." },
+  { p: "¿Cuál es el teléfono municipal de Protección Ambiental de Paraíso?", ops: ["933 688 5861","933 164 4112","933 136 3054","800 000 0000"], r: 2, exp: "El 933 136 3054 es el número de Protección Ambiental y Desarrollo Sustentable de Paraíso." },
+  { p: "¿Cuántos años tarda una bolsa de plástico convencional en degradarse?", ops: ["10 años","50 años","100 años","400 años"], r: 3, exp: "Una bolsa de plástico puede tardar hasta 400 años en degradarse. Usa bolsas reutilizables." },
+  { p: "¿Qué tipo de residuo NUNCA debes tirar al drenaje?", ops: ["Agua con jabón","Aceite de cocina usado","Agua de lluvia","Agua hervida"], r: 1, exp: "El aceite de cocina obstruye los drenajes y contamina cuerpos de agua. Llévalo al DIF Municipal." },
+  { p: "¿Cuánta agua se puede ahorrar cerrando la llave mientras te cepillas los dientes?", ops: ["1 litro","5 litros","15 litros","30 litros"], r: 2, exp: "Se ahorran aproximadamente 15 litros de agua cada vez que cierras la llave al cepillarte." },
+  { p: "¿Qué significa RAEE en residuos?", ops: ["Residuos Agrícolas Especiales del Estado","Residuos de Aparatos Eléctricos y Electrónicos","Reciclaje de Aceites y Elementos Especiales","Residuos Ambientales de Emergencia Ecológica"], r: 1, exp: "RAEE son los residuos de aparatos eléctricos y electrónicos: celulares, laptops, cables, etc." },
+  { p: "¿Qué municipio costero de Tabasco tiene la mayor extensión de manglares?", ops: ["Cárdenas","Comalcalco","Paraíso","Centla"], r: 3, exp: "Centla tiene la mayor extensión, pero Paraíso es uno de los municipios con ecosistemas de manglar más importantes del estado." },
+  { p: "¿Cuántas veces se puede reciclar el aluminio?", ops: ["Solo una vez","5 veces máximo","10 veces","Infinitas veces"], r: 3, exp: "El aluminio es 100% reciclable de forma indefinida sin perder calidad. ¡Nunca pierdas una lata!" },
+  { p: "¿Cuánto tarda en degradarse un pañal desechable?", ops: ["10 años","50 años","200 años","500 años"], r: 3, exp: "Un pañal desechable puede tardar hasta 500 años en degradarse. Es uno de los residuos más problemáticos." },
+  { p: "¿Qué es la separación en origen?", ops: ["Reciclar fuera de casa","Separar basura en casa antes de tirarla","Llevar residuos al basurero municipal","Quemar basura en el patio"], r: 1, exp: "Separar en origen es dividir tu basura en casa: orgánica, inorgánica y especiales. ¡Es el primer paso!" },
+  { p: "¿Cuánto CO₂ absorbe un árbol de manglar al año?", ops: ["1 kg","10 kg","50 kg","200 kg"], r: 2, exp: "Un árbol de manglar puede absorber hasta 50 kg de CO₂ al año, mucho más que un árbol terrestre promedio." },
+  { p: "¿Qué residuo especial acepta el DIF Municipal de Paraíso los miércoles y viernes?", ops: ["Pilas","Ropa usada","Aceite de cocina","Electrónicos"], r: 2, exp: "El DIF Municipal de Paraíso recibe aceite de cocina usado miércoles y viernes de 9 a 13h." },
+  { p: "¿Qué significa el número dentro del triángulo de reciclaje en los plásticos?", ops: ["El precio del producto","El tipo de plástico para reciclar correctamente","El peso del envase","La temperatura de fabricación"], r: 1, exp: "El número indica el tipo de plástico: el 1 (PET) es el más reciclado y aceptado en la mayoría de centros." },
+  { p: "¿Cuántos litros de agua se necesitan para producir 1 kg de carne de res?", ops: ["100 litros","500 litros","5,000 litros","15,000 litros"], r: 3, exp: "Se necesitan aproximadamente 15,000 litros de agua para producir 1 kg de carne de res. Reducir su consumo ayuda al planeta." },
+  { p: "¿Cuál es la principal causa de contaminación en las playas de Paraíso?", ops: ["Barcos pesqueros","Residuos sólidos desde zonas urbanas","Lluvias ácidas","Derrames de petróleo"], r: 1, exp: "El 80% de la basura en playas proviene de malos hábitos en zonas urbanas, no del mar." },
+  { p: "¿Qué se puede hacer con el cartón antes de llevarlo al centro de acopio?", ops: ["Quemarlo para reducir volumen","Mojarlo para facilitar el reciclaje","Doblarlo y retirar cinta adhesiva","Mezclarlo con plásticos"], r: 2, exp: "Dobla las cajas, retira cinta adhesiva y mantén el cartón seco. Así es más fácil de reciclar." },
+  { p: "¿Qué tipo de foco consume menos energía?", ops: ["Foco incandescente","Foco halógeno","Foco LED","Foco fluorescente compacto"], r: 2, exp: "Los focos LED consumen hasta 80% menos energía que los incandescentes y duran mucho más." },
+  { p: "¿Cuánto tiempo tarda en degradarse una colilla de cigarro?", ops: ["1 año","5 años","10 años","25 años"], r: 2, exp: "Una colilla puede tardar hasta 10 años en degradarse y contamina el agua con más de 60 sustancias tóxicas." },
+  { p: "¿Cuál de estas acciones ayuda más a reducir tu huella de carbono?", ops: ["Apagar las luces al salir","Usar transporte público o bicicleta","Reciclar papel","Usar bolsas reutilizables"], r: 1, exp: "El transporte es la mayor fuente de CO₂ personal. Usar transporte público o bicicleta tiene el mayor impacto." },
+  { p: "¿Dónde puedes llevar tus electrónicos en Paraíso?", ops: ["Al basurero municipal","Al ITMAT (zona universitaria)","A cualquier chatarrera","Solo en Villahermosa"], r: 1, exp: "El ITMAT en la zona universitaria de Paraíso recibe electrónicos lun–vie 9–15h." },
+  { p: "¿Qué es la compostación?", ops: ["Quemar residuos para reducir volumen","Transformar residuos orgánicos en abono natural","Separar plásticos por color","Reciclar metales en chatarrerías"], r: 1, exp: "El compostaje transforma residuos orgánicos (cáscaras, restos de comida) en abono natural para plantas." },
+  { p: "¿Cuánto tarda en degradarse una lata de aluminio?", ops: ["10 años","80 años","200 años","500 años"], r: 1, exp: "Una lata de aluminio tarda unos 80 años en degradarse. ¡Pero reciclada puede volver como lata nueva en 60 días!" },
+  { p: "¿Qué porcentaje de los residuos en México podría reciclarse pero va al relleno sanitario?", ops: ["10%","30%","50%","70%"], r: 3, exp: "Cerca del 70% de los residuos que van al relleno sanitario podrían reciclarse. La separación en origen es clave." },
+  { p: "¿Cuántos años dura en el ambiente el metano producido por basura orgánica en rellenos?", ops: ["2 años","12 años","50 años","100 años"], r: 1, exp: "El metano dura unos 12 años en la atmósfera, pero tiene un efecto invernadero 25 veces mayor que el CO₂." },
 ];
+
+// ── SELECCIÓN DIARIA ALEATORIA DE 8 PREGUNTAS ─────────────────
+function seleccionarPreguntasDelDia() {
+  const hoy = new Date();
+  const semilla = hoy.getFullYear() * 10000 + (hoy.getMonth()+1) * 100 + hoy.getDate();
+  // Barajado determinístico con semilla de la fecha
+  const shuffled = [...BANCO_PREGUNTAS];
+  let seed = semilla;
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    seed = (seed * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(seed) % (i + 1);
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, 8);
+}
+
+const PREGUNTAS = seleccionarPreguntasDelDia();
+
+// Mostrar qué día es en el quiz
+const hoyStr = new Date().toLocaleDateString("es-MX", { weekday:"long", day:"numeric", month:"long" });
 
 let qActual = 0, qPuntos = 0, qRespondida = false;
 
@@ -685,6 +727,9 @@ function iniciarQuiz() {
 }
 
 function arrancarQuiz() {
+  // Mostrar fecha del quiz
+  const fechaEl = document.getElementById("quizFecha");
+  if (fechaEl) fechaEl.textContent = `Quiz del día — ${hoyStr}. Las preguntas cambian cada día.`;
   qActual = 0; qPuntos = 0; qRespondida = false;
   quizNombreJugador = document.getElementById("quizNombre")?.value.trim() || "Anónimo";
   quizCodigoClase   = (document.getElementById("quizCodigo")?.value.trim() || "").toUpperCase();
