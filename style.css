@@ -434,3 +434,43 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--off);color:#22
 .quiz-entry-title{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.4rem}
 .quiz-entry-sub{font-size:.88rem;color:#9bc97a;margin-bottom:1.5rem;line-height:1.5}
 .quiz-entry-form{text-align:left}
+
+/* ── PLEDGES REGISTRO ────────────────────────────────────────── */
+.pledge-registro{text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:2rem;max-width:460px;margin:0 auto 2rem}
+.pledge-reg-icon{font-size:2.5rem;margin-bottom:.5rem}
+.pledge-registro h3{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.pledge-registro p{font-size:.85rem;color:#9bc97a;margin-bottom:1.25rem}
+.pledge-reg-form{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+.pledge-reg-form input{flex:1;min-width:180px;padding:.6rem .9rem;border-radius:999px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:.9rem;outline:none;transition:border-color .2s;font-family:inherit}
+.pledge-reg-form input:focus{border-color:var(--g-accent)}
+.pledge-reg-form input::placeholder{color:#5a7a5a}
+
+/* PLEDGE USER CARD */
+.pledge-user-card{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.puc-avatar{width:52px;height:52px;border-radius:50%;background:var(--g-green);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:var(--g-accent);flex-shrink:0}
+.puc-info{flex:1;min-width:0}
+.puc-nombre{font-size:1rem;font-weight:700;color:#fff;margin-bottom:2px}
+.puc-nivel{font-size:.82rem;color:var(--g-accent)}
+.puc-puntos{font-size:.78rem;color:#7a9f6a;margin-top:2px}
+.puc-barra-bg{height:5px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;margin-top:6px;max-width:200px}
+.puc-barra-fill{height:100%;background:var(--g-accent);border-radius:999px;transition:width .5s ease}
+.puc-badge{font-size:1.4rem;flex-shrink:0}
+
+/* RANKING */
+.pledge-ranking-wrap{margin-top:2rem}
+.pledge-ranking-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.pledge-ranking-title i{color:var(--g-accent)}
+.pledge-ranking{display:flex;flex-direction:column;gap:.5rem}
+.rank-card{display:flex;align-items:center;gap:.85rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:.65rem 1rem;transition:border-color .2s}
+.rank-card.es-tu{border-color:var(--g-accent);background:rgba(122,191,58,.08)}
+.rank-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0}
+.rank-num.top1{background:#FFD700;color:#5a3a00}
+.rank-num.top2{background:#C0C0C0;color:#3a3a3a}
+.rank-num.top3{background:#CD7F32;color:#fff}
+.rank-num.normal{background:rgba(255,255,255,.1);color:#aaa}
+.rank-avatar{width:36px;height:36px;border-radius:50%;background:var(--g-green);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:var(--g-accent);flex-shrink:0}
+.rank-info{flex:1;min-width:0}
+.rank-nombre{font-size:.88rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-nivel{font-size:.72rem;color:var(--g-accent);margin-top:1px}
+.rank-puntos{font-size:.88rem;font-weight:700;color:var(--g-accent);flex-shrink:0;text-align:right}
+.rank-puntos small{display:block;font-size:.65rem;color:#7a9f6a;font-weight:400}
