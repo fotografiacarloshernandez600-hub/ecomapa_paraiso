@@ -1270,3 +1270,16 @@ function showMsg2(id, txt, tipo) {
   el.textContent=txt; el.className=`msg-envio msg-${tipo}`; el.classList.remove("hidden");
   setTimeout(()=>el.classList.add("hidden"),5000);
 }
+
+// ── NAV MÓVIL — resaltar ítem activo ──────────────────────────
+const mnavItems = document.querySelectorAll(".mnav-item");
+const mnavObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      mnavItems.forEach(i => i.classList.remove("active"));
+      const link = document.querySelector(`.mnav-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add("active");
+    }
+  });
+}, { threshold: 0.4 });
+document.querySelectorAll("section[id]").forEach(s => mnavObserver.observe(s));
