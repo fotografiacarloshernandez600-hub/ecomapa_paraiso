@@ -45,7 +45,7 @@
   <div class="hero-bg"></div>
   <div class="hero-particles" id="particles"></div>
   <div class="hero-content">
-    <div class="hero-badge"><i class="fa-solid fa-leaf"></i> Proyecto ecológico digital · 2025</div>
+    <div class="hero-badge"><i class="fa-solid fa-leaf"></i> Proyecto ecológico digital · 2026</div>
     <h1>Encuentra dónde reciclar<br/><span class="hero-accent">en Paraíso, Tabasco</span></h1>
     <p>Mapa interactivo con centros de acopio, rutas de recolección y reportes ciudadanos en tiempo real. Gratuito, sin instalar nada.</p>
     <div class="hero-btns">
@@ -234,7 +234,25 @@
   <div class="section-inner">
     <h2><i class="fa-solid fa-brain"></i> Quiz ecológico</h2>
     <p class="section-sub">¿Qué tanto sabes sobre reciclaje y medio ambiente en Paraíso? Pon a prueba tus conocimientos.</p>
-    <div class="quiz-card" id="quizCard">
+    <!-- Pantalla de entrada al quiz -->
+    <div class="quiz-entry" id="quizEntry">
+      <div class="quiz-entry-icon">🌿</div>
+      <h3 class="quiz-entry-title">Quiz ecológico de Paraíso</h3>
+      <p class="quiz-entry-sub">Pon a prueba tus conocimientos sobre reciclaje y medio ambiente local.</p>
+      <div class="quiz-entry-form">
+        <div class="field-group" style="margin-bottom:.75rem">
+          <label style="color:var(--g-accent);font-size:.8rem;font-weight:600"><i class="fa-solid fa-user"></i> Tu nombre</label>
+          <input type="text" id="quizNombre" placeholder="Anónimo" style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:.55rem .85rem;font-size:.9rem;width:100%;outline:none"/>
+        </div>
+        <div class="field-group" style="margin-bottom:1rem">
+          <label style="color:var(--g-accent);font-size:.8rem;font-weight:600"><i class="fa-solid fa-school"></i> Código de clase <span style="color:#7a9f6a;font-weight:400">(opcional — si tu maestro te dio uno)</span></label>
+          <input type="text" id="quizCodigo" placeholder="Ej. ECO-AB3X" style="background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:.55rem .85rem;font-size:.9rem;width:100%;outline:none;text-transform:uppercase;letter-spacing:.08em"/>
+        </div>
+        <button class="btn-primary" id="btnEmpezarQuiz" style="width:100%;justify-content:center"><i class="fa-solid fa-play"></i> Empezar quiz</button>
+      </div>
+    </div>
+
+    <div class="quiz-card hidden" id="quizCard">
       <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
       <div class="quiz-num" id="quizNum">Pregunta 1 de 8</div>
       <div class="quiz-pregunta" id="quizPregunta"></div>
@@ -441,7 +459,7 @@
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-logo"><i class="fa-solid fa-leaf"></i> EcoMapa Paraíso</div>
-    <p>Proyecto universitario · Paraíso, Tabasco · 2025</p>
+    <p>Proyecto universitario · Paraíso, Tabasco · 2026</p>
     <p>Tecnología al servicio de los manglares y la costa de Paraíso.</p>
     <p class="footer-tel"><i class="fa-solid fa-phone"></i> Reportes municipales: <strong>933 136 3054</strong></p>
   </div>
