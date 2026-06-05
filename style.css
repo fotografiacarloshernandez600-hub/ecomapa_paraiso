@@ -427,3 +427,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--off);color:#22
 .codigo-clase{font-size:2.5rem;font-weight:800;letter-spacing:.3em;color:var(--g-dark);background:var(--g-pale);padding:.75rem 1.5rem;border-radius:var(--radius);margin-bottom:1.25rem;display:inline-block}
 .escuela-modal .btn-primary{width:100%;justify-content:center;margin-bottom:.5rem}
 .escuela-close{background:none;border:none;font-size:.85rem;color:var(--gray);cursor:pointer;margin-top:.25rem}
+
+/* ── QUIZ ENTRY ──────────────────────────────────────────────── */
+.quiz-entry{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:2rem;max-width:480px;margin:0 auto;text-align:center}
+.quiz-entry-icon{font-size:2.5rem;margin-bottom:.75rem}
+.quiz-entry-title{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.4rem}
+.quiz-entry-sub{font-size:.88rem;color:#9bc97a;margin-bottom:1.5rem;line-height:1.5}
+.quiz-entry-form{text-align:left}
