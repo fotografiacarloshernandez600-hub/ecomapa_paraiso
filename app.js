@@ -930,7 +930,7 @@ window.compartirJornada = (nombre, fecha, colonia, punto) => {
   window.open("https://wa.me/?text="+msg,"_blank");
 };
 
-// ── PLEDGES ECOLÓGICOS ────────────────────────────────────────
+// ── PLEDGES ECOLÓGICOS CON RANKING ───────────────────────────
 const PLEDGES_DATA = [
   { id:"p1", icon:"🚲", text:"Me moveré en bicicleta o a pie al menos 3 días por semana" },
   { id:"p2", icon:"♻️", text:"Separaré mi basura en orgánica e inorgánica todos los días" },
@@ -942,8 +942,73 @@ const PLEDGES_DATA = [
   { id:"p8", icon:"🧴", text:"Llevaré mi aceite usado al DIF Municipal de Paraíso" },
 ];
 
+const NIVELES = [
+  { min:0, max:0, nombre:"Sin compromisos",  emoji:"",   color:"#aaa" },
+  { min:1, max:2, nombre:"🌱 Explorador",    emoji:"🌱", color:"#7ABF3A" },
+  { min:3, max:4, nombre:"🌿 Guardián",      emoji:"🌿", color:"#4A8C2A" },
+  { min:5, max:6, nombre:"🦋 Defensor",      emoji:"🦋", color:"#0F6E56" },
+  { min:7, max:8, nombre:"🏆 Héroe Ambiental",emoji:"🏆",color:"#BA7517" },
+];
+
+function getNivel(n) {
+  return NIVELES.slice().reverse().find(nv => n >= nv.min) || NIVELES[0];
+}
+
+function getIniciales(nombre) {
+  return nombre.split(" ").map(p=>p[0]||"").join("").slice(0,2).toUpperCase() || "🌿";
+}
+
+// Estado del usuario actual
+let pledgeNombreUsuario = localStorage.getItem("pledge_nombre") || "";
 let pledgesCounts = {};
 let pledgesFirmados = new Set(JSON.parse(localStorage.getItem("pledges_firmados")||"[]"));
+let pledgeUserId = localStorage.getItem("pledge_userid") || ("user_"+Math.random().toString(36).slice(2,10));
+localStorage.setItem("pledge_userid", pledgeUserId);
+
+// Mostrar u ocultar registro según si ya tiene nombre
+function initPledgeUI() {
+  if (pledgeNombreUsuario) {
+    document.getElementById("pledgeRegistro")?.classList.add("hidden");
+    document.getElementById("pledgesContent")?.classList.remove("hidden");
+    renderUserCard();
+    renderPledges();
+  } else {
+    document.getElementById("pledgeRegistro")?.classList.remove("hidden");
+    document.getElementById("pledgesContent")?.classList.add("hidden");
+  }
+}
+
+document.getElementById("btnRegistroPledge")?.addEventListener("click", () => {
+  const inp = document.getElementById("pledgeNombre");
+  const nombre = inp?.value.trim();
+  if (!nombre) { inp?.focus(); return; }
+  pledgeNombreUsuario = nombre;
+  localStorage.setItem("pledge_nombre", nombre);
+  initPledgeUI();
+});
+
+document.getElementById("pledgeNombre")?.addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("btnRegistroPledge")?.click();
+});
+
+function renderUserCard() {
+  const card = document.getElementById("pledgeUserCard");
+  if (!card) return;
+  const n = pledgesFirmados.size;
+  const nivel = getNivel(n);
+  const pct = Math.round(n / 8 * 100);
+  const sigNivel = NIVELES.find(nv => nv.min > n);
+  const faltanParaSig = sigNivel ? sigNivel.min - n : 0;
+  card.innerHTML = `
+    <div class="puc-avatar">${getIniciales(pledgeNombreUsuario)}</div>
+    <div class="puc-info">
+      <div class="puc-nombre">${pledgeNombreUsuario}</div>
+      <div class="puc-nivel" style="color:${nivel.color}">${nivel.nombre}</div>
+      <div class="puc-puntos">${n}/8 compromisos firmados${faltanParaSig>0?` · Faltan ${faltanParaSig} para ${sigNivel.nombre}`:""}</div>
+      <div class="puc-barra-bg"><div class="puc-barra-fill" style="width:${pct}%;background:${nivel.color}"></div></div>
+    </div>
+    <div class="puc-badge">${nivel.emoji||"🌱"}</div>`;
+}
 
 function renderPledges() {
   const grid = document.getElementById("pledgesGrid");
@@ -957,30 +1022,86 @@ function renderPledges() {
     </div>`).join("");
 }
 
-onSnapshot(collection(db,"pledges"), snap => {
+// Escuchar pledges en tiempo real
+onSnapshot(collection(db,"usuarios_pledges"), snap => {
   pledgesCounts = {};
   let total = 0;
-  snap.docs.forEach(d => { const data=d.data(); pledgesCounts[data.pledgeId]=(pledgesCounts[data.pledgeId]||0)+1; total++; });
+  snap.docs.forEach(d => {
+    const data = d.data();
+    (data.pledges||[]).forEach(pid => {
+      pledgesCounts[pid] = (pledgesCounts[pid]||0) + 1;
+      total++;
+    });
+  });
   animCounter("pledgeTotal", total);
   renderPledges();
+  renderRankingPledges(snap.docs.map(d=>({id:d.id,...d.data()})));
   document.querySelectorAll(".pledge-count").forEach(el => {
-    const id = el.id.replace("pc-","");
-    el.textContent = (pledgesCounts[id]||0) + " personas firmaron";
+    const pid = el.id.replace("pc-","");
+    el.textContent = (pledgesCounts[pid]||0) + " personas firmaron";
   });
 });
 
-window.firmarPledge = async (id, card) => {
-  if (pledgesFirmados.has(id)) return;
-  pledgesFirmados.add(id);
+window.firmarPledge = async (pid, card) => {
+  if (!pledgeNombreUsuario) {
+    document.getElementById("pledgeRegistro")?.scrollIntoView({behavior:"smooth"});
+    return;
+  }
+  if (pledgesFirmados.has(pid)) return;
+  pledgesFirmados.add(pid);
   localStorage.setItem("pledges_firmados", JSON.stringify([...pledgesFirmados]));
   card.classList.add("signed");
+  renderUserCard();
+
   try {
-    await addDoc(collection(db,"pledges"), { pledgeId:id, fecha:serverTimestamp() });
-    await registrarAccion("pledge","Ciudadano","Paraíso");
-  } catch(e) { console.log(e); }
+    // Guardar en colección usuarios_pledges (un doc por usuario)
+    const { setDoc, doc: firestoreDoc, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await setDoc(firestoreDoc(db,"usuarios_pledges",pledgeUserId), {
+      nombre: pledgeNombreUsuario,
+      pledges: arrayUnion(pid),
+      total: pledgesFirmados.size,
+      nivel: getNivel(pledgesFirmados.size).nombre,
+      fecha: serverTimestamp(),
+    }, { merge: true });
+    await registrarAccion("pledge", pledgeNombreUsuario, "Paraíso");
+  } catch(e) { console.log("pledge error:", e.message); }
 };
 
-renderPledges();
+function renderRankingPledges(usuarios) {
+  const ranking = document.getElementById("pledgeRanking");
+  if (!ranking) return;
+
+  const sorted = usuarios
+    .filter(u => u.nombre && (u.pledges||[]).length > 0)
+    .map(u => ({ ...u, n: (u.pledges||[]).length }))
+    .sort((a,b) => b.n - a.n)
+    .slice(0, 20);
+
+  if (!sorted.length) {
+    ranking.innerHTML = `<p style="color:#7a9f6a;font-size:.85rem;text-align:center;padding:1.5rem">Sé el primero en aparecer en el ranking — firma un compromiso.</p>`;
+    return;
+  }
+
+  ranking.innerHTML = sorted.map((u, i) => {
+    const nivel = getNivel(u.n);
+    const numCls = i===0?"top1":i===1?"top2":i===2?"top3":"normal";
+    const esTu = u.id === pledgeUserId;
+    return `<div class="rank-card ${esTu?"es-tu":""}">
+      <div class="rank-num ${numCls}">${i+1}</div>
+      <div class="rank-avatar">${getIniciales(u.nombre)}</div>
+      <div class="rank-info">
+        <div class="rank-nombre">${u.nombre}${esTu?' <span style="font-size:.7rem;color:var(--g-accent)">(tú)</span>':""}</div>
+        <div class="rank-nivel" style="color:${nivel.color}">${nivel.nombre}</div>
+      </div>
+      <div class="rank-puntos">
+        ${u.n}<small>compromisos</small>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// Iniciar UI de pledges
+initPledgeUI();
 
 // ── CALCULADORA DE HUELLA ─────────────────────────────────────
 const PROMEDIO_PARAISO = 180;
