@@ -471,3 +471,312 @@ onSnapshot(collection(db, "avisos"), (snap) => {
   const avisos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderAvisosPublic(avisos);
 });
+
+// ═══════════════════════════════════════════════════════════════
+// NUEVAS FUNCIONES — v2.0
+// ═══════════════════════════════════════════════════════════════
+
+// ── CONTADOR DE IMPACTO EN TIEMPO REAL ────────────────────────
+function actualizarImpacto() {
+  const ahora = new Date();
+  const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+  const tiraderos = todosMarkers.filter(m => m.datos.tipo === "tiradero");
+  const resueltosMes = tiraderos.filter(m => {
+    if(m.datos.estado !== "resuelto") return false;
+    const f = m.datos.fecha?.toDate?.();
+    return f && f >= inicioMes;
+  }).length;
+  const colonias = new Set(tiraderos.map(m => m.datos.colonia).filter(Boolean)).size;
+  const kgEstimados = tiraderos.length * 12; // estimado 12kg por tiradero promedio
+
+  animCounter("impactoReportes", tiraderos.length);
+  animCounter("impactoResueltos", resueltosMes);
+  animCounter("impactoColonias", colonias);
+  animCounter("impactoKg", kgEstimados);
+}
+
+function animCounter(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let curr = 0;
+  const step = Math.max(1, Math.ceil(target / 30));
+  const t = setInterval(() => {
+    curr = Math.min(curr + step, target);
+    el.textContent = curr;
+    if (curr >= target) clearInterval(t);
+  }, 40);
+}
+
+// ── MAPA DE CALOR ─────────────────────────────────────────────
+let heatLayer = null;
+let heatOn = false;
+
+function toggleHeatmap() {
+  const btn = document.getElementById("heatBtn");
+  const tiraderos = todosMarkers.filter(m => m.datos.tipo === "tiradero");
+  if (!tiraderos.length) return;
+
+  if (!heatLayer) {
+    const points = tiraderos.map(m => [m.datos.lat, m.datos.lng, 1]);
+    if (typeof L.heatLayer !== "undefined") {
+      heatLayer = L.heatLayer(points, {
+        radius: 35, blur: 20, maxZoom: 17,
+        gradient: { 0.2: "#EAF3DE", 0.5: "#EF9F27", 0.8: "#E24B4A" }
+      });
+    }
+  }
+
+  heatOn = !heatOn;
+  if (heatLayer) {
+    heatOn ? heatLayer.addTo(map) : map.removeLayer(heatLayer);
+  }
+  if (btn) btn.classList.toggle("on", heatOn);
+  if (btn) btn.innerHTML = heatOn
+    ? `<i class="fa-solid fa-fire"></i> Ocultar calor`
+    : `<i class="fa-solid fa-fire"></i> Mapa de calor`;
+}
+
+// Agregar botón de heatmap al mapa
+window.addEventListener("load", () => {
+  const mapWrap = document.querySelector(".mapa-wrap");
+  if (mapWrap) {
+    const btn = document.createElement("button");
+    btn.id = "heatBtn";
+    btn.className = "heatmap-toggle";
+    btn.innerHTML = `<i class="fa-solid fa-fire"></i> Mapa de calor`;
+    btn.addEventListener("click", toggleHeatmap);
+    mapWrap.appendChild(btn);
+  }
+});
+
+// ── ZONAS DE MANGLAR ──────────────────────────────────────────
+const ZONAS_MANGLAR = [
+  { nombre: "Laguna del Carmen", coords: [[18.42,  -93.15], [18.44, -93.15], [18.44, -93.05], [18.42, -93.05]], color: "#0F6E56" },
+  { nombre: "Manglar Punta Buey", coords: [[18.415, -93.24], [18.43, -93.24], [18.43, -93.20], [18.415, -93.20]], color: "#4A8C2A" },
+  { nombre: "Manglar El Escribano", coords: [[18.41,  -93.21], [18.42, -93.21], [18.42, -93.18], [18.41, -93.18]], color: "#0F6E56" },
+];
+
+let manglarLayer = false;
+const manglarPolygons = [];
+
+function toggleManglares() {
+  const btn = document.getElementById("btnManglares");
+  if (!manglarLayer) {
+    ZONAS_MANGLAR.forEach(z => {
+      const poly = L.polygon(z.coords, {
+        color: z.color, fillColor: z.color,
+        fillOpacity: 0.22, weight: 2, dashArray: "6,4"
+      }).addTo(map);
+      poly.bindPopup(`
+        <div class="popup-titulo"><i class="fa-solid fa-tree" style="color:#0F6E56"></i> ${z.nombre}</div>
+        <div class="popup-row"><i class="fa-solid fa-leaf"></i><span>Zona de manglar protegida. Reporta cualquier tiradero cercano.</span></div>
+        <div class="popup-row" style="color:#A32D2D"><i class="fa-solid fa-triangle-exclamation"></i><span>Área ecológicamente sensible.</span></div>
+      `);
+      manglarPolygons.push(poly);
+    });
+    manglarLayer = true;
+    if (btn) { btn.textContent = "🌿 Ocultar manglares"; btn.style.background = "#EAF3DE"; btn.style.borderColor = "#4A8C2A"; btn.style.color = "#2C5F2D"; }
+  } else {
+    manglarPolygons.forEach(p => map.removeLayer(p));
+    manglarPolygons.length = 0;
+    manglarLayer = false;
+    if (btn) { btn.textContent = "🌿 Ver zonas de manglar"; btn.style = ""; }
+  }
+}
+
+// Agregar botón de manglares en filtros
+window.addEventListener("load", () => {
+  const filtros = document.querySelector(".filtros");
+  if (filtros) {
+    const btn = document.createElement("button");
+    btn.id = "btnManglares";
+    btn.className = "filtro-btn";
+    btn.style.gridColumn = "1/-1";
+    btn.innerHTML = `<i class="fa-solid fa-tree" style="font-size:1rem"></i><span>🌿 Ver zonas de manglar</span>`;
+    btn.addEventListener("click", toggleManglares);
+    filtros.appendChild(btn);
+  }
+});
+
+// ── QR CODE ───────────────────────────────────────────────────
+const URL_SITIO = "https://ecomapa-paraiso.vercel.app";
+
+window.addEventListener("load", () => {
+  const qrDiv = document.getElementById("qrCode");
+  if (qrDiv && typeof QRCode !== "undefined") {
+    new QRCode(qrDiv, {
+      text: URL_SITIO,
+      width: 140, height: 140,
+      colorDark: "#1A3D0A", colorLight: "#EAF3DE",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  // Descargar QR
+  document.getElementById("btnDescargarQR")?.addEventListener("click", () => {
+    const canvas = document.querySelector("#qrCode canvas");
+    if (canvas) {
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/png");
+      a.download = "qr-ecomapa-paraiso.png";
+      a.click();
+    }
+  });
+
+  // Compartir por WhatsApp — mapa completo
+  document.getElementById("btnCompartirMapaWA")?.addEventListener("click", () => {
+    const msg = encodeURIComponent("🌿 *EcoMapa Paraíso* — Encuentra puntos de reciclaje y reporta tiraderos clandestinos en tu colonia.\n👉 " + URL_SITIO);
+    window.open("https://wa.me/?text=" + msg, "_blank");
+  });
+});
+
+// ── WHATSAPP — COMPARTIR REPORTE ──────────────────────────────
+// Se activa después de enviar un reporte exitoso (llamado desde btnEnviar)
+function mostrarBtnWhatsappReporte(colonia, desc) {
+  const btn = document.getElementById("btnWaReporte");
+  if (!btn) return;
+  btn.classList.remove("hidden");
+  btn.onclick = () => {
+    const msg = encodeURIComponent(
+      `⚠️ *Tiradero clandestino reportado en Paraíso*\n📍 Zona: ${colonia}\n📝 ${desc}\n\n🗺️ Reporta tú también en: ${URL_SITIO}#reportar\n\n_Vía EcoMapa Paraíso_`
+    );
+    window.open("https://wa.me/?text=" + msg, "_blank");
+  };
+}
+
+// Parchamos el flujo del botón enviar para llamar a mostrarBtnWhatsappReporte
+const _origBtnEnviar = document.getElementById("btnEnviar");
+if (_origBtnEnviar) {
+  _origBtnEnviar.addEventListener("click", async () => {
+    await new Promise(r => setTimeout(r, 3500)); // esperar a que se envíe
+    const colonia = document.getElementById("inp-colonia")?.value || "";
+    const desc = document.getElementById("inp-desc")?.value || "";
+    // Solo muestra si hay mensaje de éxito
+    const msgEl = document.getElementById("msgEnvio");
+    if (msgEl && msgEl.classList.contains("msg-exito")) {
+      mostrarBtnWhatsappReporte(colonia, desc);
+    }
+  }, { once: false });
+}
+
+// ── QUIZ ECOLÓGICO ────────────────────────────────────────────
+const PREGUNTAS = [
+  { p: "¿Cuántos litros de agua contamina 1 litro de aceite de cocina usado?", ops: ["100 litros","10,000 litros","1,000,000 litros","500 litros"], r: 2, exp: "¡Correcto! Un solo litro de aceite puede contaminar hasta un millón de litros de agua. Nunca lo tires por el drenaje." },
+  { p: "¿Cuánto tiempo tarda en degradarse una botella de plástico PET en el mar?", ops: ["50 años","100 años","450 años","1,000 años"], r: 2, exp: "Una botella PET tarda aproximadamente 450 años en degradarse. En Paraíso, estas botellas llegan a los manglares y lagunas." },
+  { p: "¿Qué porcentaje del oxígeno marino proviene de los ecosistemas de manglar?", ops: ["10%","70%","30%","50%"], r: 1, exp: "Los manglares producen el 70% del oxígeno marino. Los de Paraíso son vitales para el Golfo de México." },
+  { p: "¿A qué chatarrera de Paraíso puedes llevar tus pilas usadas?", ops: ["Ninguna, hay que tirarlas","Chatarra.com o Chatarrera Mendoza 1","Solo al basurero municipal","No existe opción en Paraíso"], r: 1, exp: "¡Exacto! Las pilas son residuos peligrosos. Chatarra.com (tel. 933 164 4112) y Chatarrera Mendoza 1 las reciben." },
+  { p: "¿Cuántos kg de CO₂ se evitan por cada kg de aluminio reciclado?", ops: ["2 kg CO₂","5 kg CO₂","10 kg CO₂","15 kg CO₂"], r: 2, exp: "Reciclar 1 kg de aluminio evita 10 kg de CO₂ vs. producir aluminio nuevo. Las latas que tiras tienen un gran impacto." },
+  { p: "¿En qué horario pasa el camión recolector por la Col. Centro de Paraíso?", ops: ["7 am – 2 pm","7 pm – 2 am","6 am – 12 pm","Lunes y miércoles solamente"], r: 1, exp: "El camión de la Col. Centro pasa todos los días de 7 pm a 2 am. ¡Consulta tu colonia en la sección de rutas!" },
+  { p: "¿Qué debes hacer con el plástico antes de llevarlo al punto de acopio?", ops: ["Nada, se entrega tal cual","Aplastarlo y enjuagarlo","Quemarlo para reducir volumen","Mezclarlo con residuos orgánicos"], r: 1, exp: "Correcto: enjuaga, aplasta y retira etiquetas. Esto facilita el reciclaje y reduce el espacio de transporte." },
+  { p: "¿Cuál es el teléfono municipal para reportar problemas ambientales en Paraíso?", ops: ["933 688 5861","933 164 4112","933 136 3054","800 000 0000"], r: 2, exp: "¡Exacto! El 933 136 3054 es el número de Protección Ambiental y Desarrollo Sustentable del municipio de Paraíso." },
+];
+
+let qActual = 0, qPuntos = 0, qRespondida = false;
+
+function iniciarQuiz() {
+  qActual = 0; qPuntos = 0; qRespondida = false;
+  document.getElementById("quizResultado")?.classList.add("hidden");
+  document.getElementById("quizCard")?.classList.remove("hidden");
+  mostrarPregunta();
+}
+
+function mostrarPregunta() {
+  const q = PREGUNTAS[qActual];
+  const total = PREGUNTAS.length;
+  qRespondida = false;
+
+  const progEl = document.getElementById("quizProgressFill");
+  if (progEl) progEl.style.width = ((qActual / total) * 100) + "%";
+  setEl2("quizNum", `Pregunta ${qActual + 1} de ${total}`);
+  setEl2("quizPregunta", q.p);
+
+  const ops = document.getElementById("quizOpciones");
+  if (ops) {
+    ops.innerHTML = q.ops.map((o, i) => `
+      <button class="quiz-opcion" data-idx="${i}" onclick="responder(${i})">
+        <span class="opt-letra">${String.fromCharCode(65+i)}</span>
+        ${o}
+      </button>`).join("");
+  }
+
+  const fb = document.getElementById("quizFeedback");
+  const nx = document.getElementById("quizNext");
+  if (fb) { fb.className = "quiz-feedback hidden"; fb.textContent = ""; }
+  if (nx) nx.classList.add("hidden");
+}
+
+window.responder = function(idx) {
+  if (qRespondida) return;
+  qRespondida = true;
+  const q = PREGUNTAS[qActual];
+  const opciones = document.querySelectorAll(".quiz-opcion");
+  const fb = document.getElementById("quizFeedback");
+  const nx = document.getElementById("quizNext");
+
+  opciones.forEach(op => op.classList.add("disabled"));
+
+  const esCorrecta = idx === q.r;
+  if (esCorrecta) qPuntos++;
+
+  opciones[q.r].classList.add("correcta");
+  if (!esCorrecta) opciones[idx].classList.add("incorrecta");
+
+  if (fb) {
+    fb.className = `quiz-feedback ${esCorrecta ? "ok" : "fail"}`;
+    fb.innerHTML = `${esCorrecta ? "✅" : "❌"} ${q.exp}`;
+  }
+  if (nx) {
+    nx.classList.remove("hidden");
+    nx.textContent = qActual < PREGUNTAS.length - 1 ? "Siguiente ›" : "Ver resultado";
+  }
+};
+
+document.getElementById("quizNext")?.addEventListener("click", () => {
+  qActual++;
+  if (qActual < PREGUNTAS.length) {
+    mostrarPregunta();
+  } else {
+    mostrarResultado();
+  }
+});
+
+function mostrarResultado() {
+  document.getElementById("quizCard")?.classList.add("hidden");
+  const res = document.getElementById("quizResultado");
+  if (!res) return;
+  res.classList.remove("hidden");
+
+  const pct = Math.round((qPuntos / PREGUNTAS.length) * 100);
+  const scoreEl = document.getElementById("quizScore");
+  if (scoreEl) scoreEl.textContent = `${qPuntos}/${PREGUNTAS.length}`;
+
+  const msgs = [
+    { min: 0,  msg: "¡Sigue aprendiendo! EcoMapa Paraíso te ayuda a conocer más sobre el cuidado ambiental de tu municipio. 🌱" },
+    { min: 4,  msg: "¡Buen conocimiento! Estás tomando conciencia sobre el medio ambiente de Paraíso. Comparte este quiz con tus vecinos. 🌿" },
+    { min: 6,  msg: "¡Excelente! Eres un guardián ambiental de Paraíso. Tus conocimientos ayudan a proteger nuestros manglares. 🏆" },
+  ];
+  const nivel = [...msgs].reverse().find(m => qPuntos >= m.min);
+  const msgEl = document.getElementById("quizMsg");
+  if (msgEl) msgEl.textContent = nivel?.msg || "";
+}
+
+document.getElementById("quizReiniciar")?.addEventListener("click", iniciarQuiz);
+document.getElementById("quizCompartir")?.addEventListener("click", () => {
+  const pct = Math.round((qPuntos / PREGUNTAS.length) * 100);
+  const msg = encodeURIComponent(`🌿 ¡Hice el quiz ecológico de EcoMapa Paraíso y obtuve ${qPuntos}/${PREGUNTAS.length} (${pct}%)!\n¿Tú cuánto sacarías? Pruébalo aquí: ${URL_SITIO}#quiz`);
+  window.open("https://wa.me/?text=" + msg, "_blank");
+});
+
+// Iniciar quiz cuando la sección sea visible
+const quizObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting && qActual === 0 && !qRespondida) iniciarQuiz(); });
+}, { threshold: 0.3 });
+const quizSec = document.getElementById("quiz");
+if (quizSec) quizObserver.observe(quizSec);
+
+// Llamar actualizarImpacto cuando cambien los markers
+const _origAgregarAlMapa = agregarAlMapa;
+function setEl2(id, val) { const el = document.getElementById(id); if (el) el.innerHTML = val; }
+
+// Actualizar impacto cada vez que onSnapshot dispare
+setTimeout(actualizarImpacto, 2500);
