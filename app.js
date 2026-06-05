@@ -1072,11 +1072,16 @@ function initModoEscuela() {
       <p>Comparte este código con tu grupo. Cada alumno lo ingresa al empezar el quiz. Cuando todos terminen, entra al panel del maestro para ver los resultados.</p>
       <div class="codigo-clase">${codigo}</div>
       <button class="btn-primary" onclick="compartirModoEscuela('${codigo}')"><i class="fa-brands fa-whatsapp"></i> Compartir código al grupo</button>
-      <a href="escuela.html?codigo=${codigo}" target="_blank" class="btn-primary" style="margin-top:.5rem;background:#0F6E56;text-decoration:none"><i class="fa-solid fa-chart-bar"></i> Ver resultados del grupo</a>
+      <button class="btn-primary" style="margin-top:.5rem;background:#0F6E56;border:none;cursor:pointer;width:100%;justify-content:center;display:flex;align-items:center;gap:.5rem" onclick="abrirEscuela('${codigo}')"><i class="fa-solid fa-chart-bar"></i> Ver resultados del grupo</button>
       <button class="escuela-close" onclick="document.getElementById('escuelaModal').classList.remove('open')">Cerrar</button>
     </div>`;
   document.body.appendChild(modalBg);
 }
+
+window.abrirEscuela = (codigo) => {
+  const win = window.open(`escuela.html?codigo=${codigo}`, "_blank");
+  if (!win) window.location.href = `escuela.html?codigo=${codigo}`;
+};
 
 function abrirModoEscuela(e) {
   e.preventDefault();
