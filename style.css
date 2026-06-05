@@ -242,3 +242,86 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--off);color:#22
 .aviso-nuevo .aviso-pub-titulo{color:#7ABF3A}
 .aviso-nuevo .aviso-pub-msg{color:#a8cc80}
 .avisos-empty{color:#4a6a4a;font-size:.85rem;text-align:center;padding:1.5rem;grid-column:1/-1}
+
+/* ── IMPACTO BANNER ──────────────────────────────────────────── */
+.impacto-banner{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-top:1.25rem;padding:.9rem 1.75rem;background:rgba(122,191,58,.08);border:1px solid rgba(122,191,58,.2);border-radius:var(--radius-lg);animation:fadeUp .9s .7s ease both}
+.impacto-item{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.impacto-item i{font-size:1rem;color:var(--g-accent);margin-bottom:2px}
+.impacto-item span{font-size:1.6rem;font-weight:800;color:var(--g-accent)}
+.impacto-item small{font-size:.65rem;color:#7a9f6a;text-transform:uppercase;letter-spacing:.05em}
+.impacto-sep{width:1px;height:40px;background:rgba(122,191,58,.2)}
+
+/* ── QUIZ ───────────────────────────────────────────────────── */
+.quiz-section{background:linear-gradient(135deg,#0a1f0a 0%,#0d2a10 100%);padding:0}
+.quiz-section .section-inner>h2{color:var(--g-accent)}
+.quiz-section .section-inner>h2 i{color:var(--g-soft)}
+.quiz-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:1.75rem;max-width:620px;margin:0 auto}
+.quiz-progress-bar{height:4px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;margin-bottom:1rem}
+.quiz-progress-fill{height:100%;background:var(--g-accent);border-radius:999px;transition:width .4s ease}
+.quiz-num{font-size:.78rem;color:#7a9f6a;margin-bottom:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.quiz-pregunta{font-size:1.05rem;color:#fff;font-weight:600;line-height:1.5;margin-bottom:1.25rem}
+.quiz-opciones{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.quiz-opcion{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:var(--radius);border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#ccc;font-size:.9rem;cursor:pointer;transition:all .15s;text-align:left}
+.quiz-opcion:hover{border-color:var(--g-accent);color:#fff;background:rgba(122,191,58,.08)}
+.quiz-opcion.correcta{border-color:var(--g-accent)!important;background:rgba(122,191,58,.15)!important;color:#fff!important}
+.quiz-opcion.incorrecta{border-color:#A32D2D!important;background:rgba(163,45,45,.15)!important;color:#f5a0a0!important}
+.quiz-opcion.disabled{pointer-events:none;opacity:.6}
+.quiz-opcion .opt-letra{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+.quiz-feedback{padding:.75rem 1rem;border-radius:var(--radius);font-size:.87rem;line-height:1.5;margin-bottom:.75rem}
+.quiz-feedback.ok{background:rgba(122,191,58,.12);border:1px solid rgba(122,191,58,.3);color:#9bc97a}
+.quiz-feedback.fail{background:rgba(163,45,45,.12);border:1px solid rgba(163,45,45,.3);color:#f5a0a0}
+.quiz-next{width:100%;justify-content:center}
+.quiz-resultado{text-align:center;padding:2rem;max-width:480px;margin:0 auto}
+.quiz-score{font-size:4rem;font-weight:800;color:var(--g-accent);line-height:1}
+.quiz-msg{font-size:1rem;color:#9bc97a;margin:1rem 0 1.5rem;line-height:1.6}
+.quiz-resultado .btn-primary,.quiz-resultado .btn-outline{margin:.3rem}
+.btn-wa-reporte{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.65rem;border-radius:999px;background:#25D366;color:#fff;border:none;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:all .15s}
+.btn-wa-reporte:hover{background:#1da851}
+
+/* ── CONCIENTIZACIÓN ─────────────────────────────────────────── */
+.concientiza-section{background:var(--off);padding:0}
+.concientiza-section .section-inner>h2 i{color:var(--g-light)}
+.datos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem}
+.dato-card{border-radius:var(--radius-lg);padding:1.25rem 1.15rem;border-left:4px solid;position:relative;overflow:hidden}
+.dato-card::before{content:"";position:absolute;top:0;right:0;bottom:0;width:3px;border-radius:0 var(--radius-lg) var(--radius-lg) 0}
+.dato-red{background:#FCEBEB;border-color:#A32D2D}
+.dato-amber{background:#FAEEDA;border-color:#BA7517}
+.dato-teal{background:#E1F5EE;border-color:#0F6E56}
+.dato-green{background:var(--g-pale);border-color:var(--g-light)}
+.dato-blue{background:#E6F1FB;border-color:#185FA5}
+.dato-purple{background:#EEEDFE;border-color:#534AB7}
+.dato-num{font-size:2.2rem;font-weight:800;line-height:1;margin-bottom:.2rem}
+.dato-red .dato-num{color:#A32D2D}
+.dato-amber .dato-num{color:#854F0B}
+.dato-teal .dato-num{color:#0F6E56}
+.dato-green .dato-num{color:var(--g-green)}
+.dato-blue .dato-num{color:#185FA5}
+.dato-purple .dato-num{color:#534AB7}
+.dato-titulo{font-size:.8rem;font-weight:700;color:#444;margin-bottom:.2rem}
+.dato-sub{font-size:.78rem;color:var(--gray);line-height:1.4;margin-bottom:.65rem}
+.dato-tip{font-size:.72rem;padding:.4rem .65rem;border-radius:6px;background:rgba(0,0,0,.06);color:#555;line-height:1.4}
+
+/* QR SECTION */
+.qr-section{display:flex;align-items:center;gap:2.5rem;background:#fff;border-radius:var(--radius-lg);border:1px solid #ddeeca;padding:1.75rem;flex-wrap:wrap}
+.qr-info{flex:1;min-width:220px}
+.qr-info h3{font-size:1.1rem;color:var(--g-dark);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.qr-info h3 i{color:var(--g-light)}
+.qr-info p{font-size:.88rem;color:var(--gray);margin-bottom:1.25rem;line-height:1.6}
+.qr-btns{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn-wa{background:#25D366!important;border-color:#25D366!important;color:#fff!important}
+.btn-wa:hover{background:#1da851!important}
+.qr-box{display:flex;flex-direction:column;align-items:center;gap:.5rem;flex-shrink:0}
+.qr-box small{font-size:.72rem;color:var(--gray)}
+#qrCode canvas,#qrCode img{border-radius:var(--radius);border:4px solid var(--g-pale)}
+
+/* ── MAPA DE CALOR (Leaflet) ──────────────────────────────────── */
+.heatmap-toggle{display:flex;align-items:center;gap:.5rem;padding:.4rem .85rem;border-radius:999px;border:1.5px solid var(--gray-lt);background:#fff;font-size:.8rem;cursor:pointer;color:var(--gray);transition:all .2s;position:absolute;top:12px;left:12px;z-index:500}
+.heatmap-toggle.on{background:#FAEEDA;border-color:var(--amber);color:var(--amber)}
+
+/* RESPONSIVE extra */
+@media(max-width:620px){
+  .impacto-banner{gap:.75rem;padding:.75rem 1rem}
+  .impacto-sep{display:none}
+  .quiz-card{padding:1.25rem}
+  .qr-section{flex-direction:column;align-items:flex-start}
+}
