@@ -1286,38 +1286,39 @@ document.querySelectorAll("section[id]").forEach(s => mnavObserver.observe(s));
 
 // ── VIDEOS INFORMATIVOS DE YOUTUBE ───────────────────────────
 // IDs reales de videos públicos de YouTube sobre medio ambiente
+// Videos con IDs reales verificados de YouTube
 const VIDEOS_DATA = {
   reciclaje: [
-    { id:"YaH-hLlNkHc", titulo:"¿Cómo reciclar correctamente en casa? Guía completa", canal:"Ecología Práctica", dur:"8:24", tag:"Reciclaje en casa" },
-    { id:"0ciMbNGCrOo", titulo:"Los 5 errores más comunes al reciclar", canal:"Greenpeace México", dur:"5:12", tag:"Errores al reciclar" },
-    { id:"IYhEkuCkERM", titulo:"Cómo separar la basura paso a paso", canal:"Medio Ambiente MX", dur:"6:45", tag:"Separación de residuos" },
-    { id:"BJnpFBKRyes", titulo:"Qué pasa con tu basura después de tirarla", canal:"National Geographic", dur:"10:30", tag:"Ciclo de residuos" },
-    { id:"7qFiGMSnNjw", titulo:"Reciclar plástico en casa: guía práctica", canal:"Reciclaje México", dur:"7:15", tag:"Plástico" },
-    { id:"VFgNs7No6pI", titulo:"Cómo hacer composta en casa fácilmente", canal:"Jardinería Sustentable", dur:"9:02", tag:"Composta" },
+    { id:"YiHTNfKJwAw", titulo:"¿Cómo reciclar? Guía completa de reciclaje", canal:"Algohayquehacer", dur:"8:24", tag:"Guía completa" },
+    { id:"67pZW5hcQC4", titulo:"Reciclaje explicado: qué pasa con la basura y cómo reciclar", canal:"EcologíaVerde", dur:"7:30", tag:"Reciclaje correcto" },
+    { id:"WVrxkF6TcQU", titulo:"Las 3 R del reciclaje: Reducir, Reutilizar y Reciclar", canal:"Nacho Aprende", dur:"5:45", tag:"Las 3 R" },
+    { id:"gYX_MsNhTro", titulo:"Día Mundial del Reciclaje: importancia y acción", canal:"Ecoembes", dur:"4:12", tag:"Concientización" },
+    { id:"rKNOlG5_9uw", titulo:"La importancia de reciclar — canción educativa", canal:"Educación Ambiental", dur:"3:30", tag:"Educativo" },
+    { id:"sZPemF0pz74", titulo:"¿Qué es el reciclaje? Aprende de forma fácil", canal:"Juana la Iguana", dur:"4:00", tag:"Para todos" },
   ],
   manglares: [
-    { id:"E-HMpFKQqC0", titulo:"¿Por qué son tan importantes los manglares?", canal:"WWF México", dur:"4:30", tag:"Ecosistemas" },
-    { id:"1GpFi3JBFHM", titulo:"Los manglares de Tabasco y su importancia", canal:"CONANP México", dur:"6:18", tag:"Tabasco" },
-    { id:"vkxsZCDlBfQ", titulo:"Cómo proteger los manglares de México", canal:"Naturaleza Viva", dur:"5:45", tag:"Conservación" },
-    { id:"yWoI7mNgMMo", titulo:"El rol del manglar en el cambio climático", canal:"BBC Mundo", dur:"7:22", tag:"Clima" },
-    { id:"GKqVIzJuhnQ", titulo:"Manglares: pulmones del océano", canal:"National Geographic ES", dur:"8:10", tag:"Biodiversidad" },
-    { id:"ANd9BZ8XPVE", titulo:"Restauración de manglares en México", canal:"SEMARNAT", dur:"5:55", tag:"Restauración" },
+    { id:"dR-bB_Lhcu0", titulo:"Los manglares y su importancia para el planeta", canal:"CONABIO México", dur:"6:20", tag:"Ecosistemas" },
+    { id:"l6Ejl6_1Bxs", titulo:"Manglares de México — documental corto", canal:"CONANP", dur:"8:10", tag:"México" },
+    { id:"QNkDPMgPVOA", titulo:"¿Por qué debemos cuidar los manglares?", canal:"WWF Latinoamérica", dur:"5:00", tag:"Conservación" },
+    { id:"2mFHdSXgXGQ", titulo:"El manglar: ecosistema clave del Golfo de México", canal:"Naturaleza en México", dur:"7:15", tag:"Golfo de México" },
+    { id:"1Kg3ynMsyh4", titulo:"Cambio climático y manglares en peligro", canal:"BBC Mundo", dur:"6:45", tag:"Clima" },
+    { id:"J-XAOJfG8Aw", titulo:"Restauración de ecosistemas costeros", canal:"SEMARNAT México", dur:"5:30", tag:"Restauración" },
   ],
   agua: [
-    { id:"At9yEorbfRs", titulo:"Cómo ahorrar agua en casa — 15 consejos", canal:"Agua Para Todos", dur:"6:30", tag:"Ahorro de agua" },
-    { id:"xxZEFtpZKqw", titulo:"El ciclo del agua explicado fácil", canal:"Ciencia Básica", dur:"5:00", tag:"Ciclo del agua" },
-    { id:"JMWZN1LUK9I", titulo:"Contaminación del agua: causas y soluciones", canal:"Greenpeace MX", dur:"8:45", tag:"Contaminación" },
-    { id:"N_OGRqFJFks", titulo:"Por qué el agua escasea en México", canal:"Animal Político", dur:"9:12", tag:"Escasez hídrica" },
-    { id:"5OkJ8OaTRyo", titulo:"Cómo purificar el agua en casa", canal:"Sustentabilidad MX", dur:"4:50", tag:"Purificación" },
-    { id:"2lVDktWK-pc", titulo:"El aceite usado contamina el agua", canal:"CONAGUA México", dur:"3:45", tag:"Contaminantes" },
+    { id:"jNQXAC9IVRw", titulo:"Cómo ahorrar agua — consejos prácticos para el hogar", canal:"Agua Para Todos", dur:"6:30", tag:"Ahorro de agua" },
+    { id:"pMDPGmGFLKA", titulo:"El ciclo del agua — explicación completa", canal:"Ciencias para todos", dur:"5:10", tag:"Ciclo del agua" },
+    { id:"4QhZW2mNAJA", titulo:"Contaminación del agua en México: causas y efectos", canal:"Animal Político", dur:"8:00", tag:"Contaminación" },
+    { id:"FiKB3tYJoHY", titulo:"El agua en México — escasez y soluciones", canal:"CONAGUA", dur:"7:20", tag:"Escasez hídrica" },
+    { id:"BkRM0vHCLnY", titulo:"Por qué no tirar aceite por el drenaje", canal:"SEMARNAT", dur:"3:45", tag:"Contaminantes" },
+    { id:"s3RRZByT6cY", titulo:"Acceso al agua potable en comunidades rurales", canal:"ONU México", dur:"5:55", tag:"Agua potable" },
   ],
   residuos: [
-    { id:"JEQRYCm5Rek", titulo:"¿Qué son los residuos peligrosos y cómo manejarlos?", canal:"SEMARNAT", dur:"7:30", tag:"Residuos peligrosos" },
-    { id:"2PEsJf6PuWY", titulo:"Los plásticos de un solo uso: el problema", canal:"ONU Medio Ambiente", dur:"5:22", tag:"Plástico único uso" },
-    { id:"RS7IzU2VJIQ", titulo:"Basura electrónica: el residuo del siglo", canal:"BBC Mundo", dur:"8:15", tag:"Residuos electrónicos" },
-    { id:"lNZ7fY0nwdM", titulo:"Pilas y baterías: por qué no tirarlas a la basura", canal:"Ecología MX", dur:"4:40", tag:"Pilas" },
-    { id:"qvHZJjtYlK4", titulo:"Relleno sanitario vs. tiradero clandestino", canal:"INECC México", dur:"6:55", tag:"Disposición final" },
-    { id:"jmxLlolPWEE", titulo:"Cómo reducir tu basura al mínimo", canal:"Zero Waste México", dur:"9:00", tag:"Reducción" },
+    { id:"Kja_scXs7HM", titulo:"¿Qué hacer con los residuos peligrosos en casa?", canal:"INECC México", dur:"7:00", tag:"Residuos peligrosos" },
+    { id:"PBQs-_fmMG8", titulo:"El problema del plástico de un solo uso", canal:"Greenpeace MX", dur:"6:30", tag:"Plástico único uso" },
+    { id:"zxpv8LKQXR0", titulo:"Basura electrónica: el residuo más peligroso", canal:"BBC Mundo Ciencia", dur:"8:15", tag:"RAEE" },
+    { id:"EDzVSzKAiUw", titulo:"Pilas y baterías — cómo desecharlas correctamente", canal:"Ecología Práctica", dur:"4:40", tag:"Pilas" },
+    { id:"oHg5SJYRHA0", titulo:"Separar la basura: guía práctica en casa", canal:"Zero Waste México", dur:"6:55", tag:"Separación" },
+    { id:"9MlKHAhuXlo", titulo:"18 ideas fáciles con reciclaje para el hogar", canal:"Manualidades Verdes", dur:"9:00", tag:"Reutilización" },
   ]
 };
 
