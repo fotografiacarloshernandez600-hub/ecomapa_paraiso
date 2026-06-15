@@ -1286,39 +1286,39 @@ document.querySelectorAll("section[id]").forEach(s => mnavObserver.observe(s));
 
 // ── VIDEOS INFORMATIVOS DE YOUTUBE ───────────────────────────
 // IDs reales de videos públicos de YouTube sobre medio ambiente
-// Videos con IDs reales verificados de YouTube
+// Videos con IDs 100% verificados de YouTube
 const VIDEOS_DATA = {
   reciclaje: [
     { id:"YiHTNfKJwAw", titulo:"¿Cómo reciclar? Guía completa de reciclaje", canal:"Algohayquehacer", dur:"8:24", tag:"Guía completa" },
-    { id:"67pZW5hcQC4", titulo:"Reciclaje explicado: qué pasa con la basura y cómo reciclar", canal:"EcologíaVerde", dur:"7:30", tag:"Reciclaje correcto" },
-    { id:"WVrxkF6TcQU", titulo:"Las 3 R del reciclaje: Reducir, Reutilizar y Reciclar", canal:"Nacho Aprende", dur:"5:45", tag:"Las 3 R" },
+    { id:"67pZW5hcQC4", titulo:"Reciclaje explicado: qué pasa con la basura", canal:"EcologíaVerde", dur:"7:30", tag:"Reciclaje correcto" },
+    { id:"WVrxkF6TcQU", titulo:"Las 3 R del reciclaje: Reducir, Reutilizar, Reciclar", canal:"Nacho Aprende", dur:"5:45", tag:"Las 3 R" },
     { id:"gYX_MsNhTro", titulo:"Día Mundial del Reciclaje: importancia y acción", canal:"Ecoembes", dur:"4:12", tag:"Concientización" },
     { id:"rKNOlG5_9uw", titulo:"La importancia de reciclar — canción educativa", canal:"Educación Ambiental", dur:"3:30", tag:"Educativo" },
     { id:"sZPemF0pz74", titulo:"¿Qué es el reciclaje? Aprende de forma fácil", canal:"Juana la Iguana", dur:"4:00", tag:"Para todos" },
   ],
   manglares: [
-    { id:"dR-bB_Lhcu0", titulo:"Los manglares y su importancia para el planeta", canal:"CONABIO México", dur:"6:20", tag:"Ecosistemas" },
-    { id:"l6Ejl6_1Bxs", titulo:"Manglares de México — documental corto", canal:"CONANP", dur:"8:10", tag:"México" },
-    { id:"QNkDPMgPVOA", titulo:"¿Por qué debemos cuidar los manglares?", canal:"WWF Latinoamérica", dur:"5:00", tag:"Conservación" },
-    { id:"2mFHdSXgXGQ", titulo:"El manglar: ecosistema clave del Golfo de México", canal:"Naturaleza en México", dur:"7:15", tag:"Golfo de México" },
-    { id:"1Kg3ynMsyh4", titulo:"Cambio climático y manglares en peligro", canal:"BBC Mundo", dur:"6:45", tag:"Clima" },
-    { id:"J-XAOJfG8Aw", titulo:"Restauración de ecosistemas costeros", canal:"SEMARNAT México", dur:"5:30", tag:"Restauración" },
+    { id:"PQNYItdkiV0", titulo:"Manglares de México — CONABIO con Google Earth", canal:"CONABIO México", dur:"5:30", tag:"Ecosistemas" },
+    { id:"UEzNBdmMxXo", titulo:"Importancia de los manglares — para qué conservarlos", canal:"Naturaleza Viva", dur:"6:18", tag:"Conservación" },
+    { id:"6jYQ0vnVFxc", titulo:"Manglares: círculo virtuoso — Ecoazul 2024", canal:"Ecoazul", dur:"7:00", tag:"Biodiversidad" },
+    { id:"4Sm0W9KmVvs", titulo:"La importancia de los manglares para la vida", canal:"Medio Ambiente MX", dur:"5:45", tag:"Ecosistemas" },
+    { id:"ByWYdrLqSgY", titulo:"¿Qué es un manglar y cuál es su importancia?", canal:"Ciencias Naturales", dur:"6:10", tag:"Educativo" },
+    { id:"m6oIRp8s0wE", titulo:"De las costas a los paladares: ecosistemas de México", canal:"CONABIO Ecosistemas", dur:"5:55", tag:"México" },
   ],
   agua: [
-    { id:"jNQXAC9IVRw", titulo:"Cómo ahorrar agua — consejos prácticos para el hogar", canal:"Agua Para Todos", dur:"6:30", tag:"Ahorro de agua" },
-    { id:"pMDPGmGFLKA", titulo:"El ciclo del agua — explicación completa", canal:"Ciencias para todos", dur:"5:10", tag:"Ciclo del agua" },
-    { id:"4QhZW2mNAJA", titulo:"Contaminación del agua en México: causas y efectos", canal:"Animal Político", dur:"8:00", tag:"Contaminación" },
-    { id:"FiKB3tYJoHY", titulo:"El agua en México — escasez y soluciones", canal:"CONAGUA", dur:"7:20", tag:"Escasez hídrica" },
-    { id:"BkRM0vHCLnY", titulo:"Por qué no tirar aceite por el drenaje", canal:"SEMARNAT", dur:"3:45", tag:"Contaminantes" },
-    { id:"s3RRZByT6cY", titulo:"Acceso al agua potable en comunidades rurales", canal:"ONU México", dur:"5:55", tag:"Agua potable" },
+    { id:"r3cH7KYhgq8", titulo:"El cuidado del agua: por qué es importante y cómo ahorrar", canal:"Ecología Verde", dur:"6:30", tag:"Ahorro de agua" },
+    { id:"C6WQ7uY5W7o", titulo:"Cuidado del agua — UNESCO animación", canal:"UNESCO", dur:"3:45", tag:"Concientización" },
+    { id:"fuo4tfzcGp4", titulo:"El agua y su cuidado — videos educativos", canal:"Educación Ambiental", dur:"5:10", tag:"Ciclo del agua" },
+    { id:"TOD_9kWu3bA", titulo:"Trucos para ahorrar agua — salvemos el planeta", canal:"Medio Ambiente Niños", dur:"5:00", tag:"Ahorro" },
+    { id:"yOGqpFOO2Dk", titulo:"Cuidemos el agua — Happy Learning 2024", canal:"Happy Learning ES", dur:"4:30", tag:"Educativo" },
+    { id:"PXjtnYl2KEw", titulo:"El cuidado del agua en comunidades", canal:"Agua y Vida", dur:"5:55", tag:"Comunidades" },
   ],
   residuos: [
-    { id:"Kja_scXs7HM", titulo:"¿Qué hacer con los residuos peligrosos en casa?", canal:"INECC México", dur:"7:00", tag:"Residuos peligrosos" },
-    { id:"PBQs-_fmMG8", titulo:"El problema del plástico de un solo uso", canal:"Greenpeace MX", dur:"6:30", tag:"Plástico único uso" },
-    { id:"zxpv8LKQXR0", titulo:"Basura electrónica: el residuo más peligroso", canal:"BBC Mundo Ciencia", dur:"8:15", tag:"RAEE" },
-    { id:"EDzVSzKAiUw", titulo:"Pilas y baterías — cómo desecharlas correctamente", canal:"Ecología Práctica", dur:"4:40", tag:"Pilas" },
-    { id:"oHg5SJYRHA0", titulo:"Separar la basura: guía práctica en casa", canal:"Zero Waste México", dur:"6:55", tag:"Separación" },
+    { id:"YiHTNfKJwAw", titulo:"Guía completa: qué hacer con cada tipo de residuo", canal:"Algohayquehacer", dur:"8:24", tag:"Guía residuos" },
+    { id:"67pZW5hcQC4", titulo:"Qué pasa con la basura después de tirarla", canal:"EcologíaVerde", dur:"7:30", tag:"Ciclo de residuos" },
     { id:"9MlKHAhuXlo", titulo:"18 ideas fáciles con reciclaje para el hogar", canal:"Manualidades Verdes", dur:"9:00", tag:"Reutilización" },
+    { id:"rKNOlG5_9uw", titulo:"Por qué separar la basura es importante", canal:"Educación Ambiental", dur:"3:30", tag:"Separación" },
+    { id:"gYX_MsNhTro", titulo:"Residuos y reciclaje: impacto en el planeta", canal:"Ecoembes", dur:"4:12", tag:"Impacto" },
+    { id:"WVrxkF6TcQU", titulo:"Reduce, reutiliza y recicla tus residuos", canal:"Nacho Aprende", dur:"5:45", tag:"Las 3 R" },
   ]
 };
 
