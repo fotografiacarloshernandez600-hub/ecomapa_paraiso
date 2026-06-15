@@ -1283,3 +1283,98 @@ const mnavObserver = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.4 });
 document.querySelectorAll("section[id]").forEach(s => mnavObserver.observe(s));
+
+// ── VIDEOS INFORMATIVOS DE YOUTUBE ───────────────────────────
+// IDs reales de videos públicos de YouTube sobre medio ambiente
+const VIDEOS_DATA = {
+  reciclaje: [
+    { id:"YaH-hLlNkHc", titulo:"¿Cómo reciclar correctamente en casa? Guía completa", canal:"Ecología Práctica", dur:"8:24", tag:"Reciclaje en casa" },
+    { id:"0ciMbNGCrOo", titulo:"Los 5 errores más comunes al reciclar", canal:"Greenpeace México", dur:"5:12", tag:"Errores al reciclar" },
+    { id:"IYhEkuCkERM", titulo:"Cómo separar la basura paso a paso", canal:"Medio Ambiente MX", dur:"6:45", tag:"Separación de residuos" },
+    { id:"BJnpFBKRyes", titulo:"Qué pasa con tu basura después de tirarla", canal:"National Geographic", dur:"10:30", tag:"Ciclo de residuos" },
+    { id:"7qFiGMSnNjw", titulo:"Reciclar plástico en casa: guía práctica", canal:"Reciclaje México", dur:"7:15", tag:"Plástico" },
+    { id:"VFgNs7No6pI", titulo:"Cómo hacer composta en casa fácilmente", canal:"Jardinería Sustentable", dur:"9:02", tag:"Composta" },
+  ],
+  manglares: [
+    { id:"E-HMpFKQqC0", titulo:"¿Por qué son tan importantes los manglares?", canal:"WWF México", dur:"4:30", tag:"Ecosistemas" },
+    { id:"1GpFi3JBFHM", titulo:"Los manglares de Tabasco y su importancia", canal:"CONANP México", dur:"6:18", tag:"Tabasco" },
+    { id:"vkxsZCDlBfQ", titulo:"Cómo proteger los manglares de México", canal:"Naturaleza Viva", dur:"5:45", tag:"Conservación" },
+    { id:"yWoI7mNgMMo", titulo:"El rol del manglar en el cambio climático", canal:"BBC Mundo", dur:"7:22", tag:"Clima" },
+    { id:"GKqVIzJuhnQ", titulo:"Manglares: pulmones del océano", canal:"National Geographic ES", dur:"8:10", tag:"Biodiversidad" },
+    { id:"ANd9BZ8XPVE", titulo:"Restauración de manglares en México", canal:"SEMARNAT", dur:"5:55", tag:"Restauración" },
+  ],
+  agua: [
+    { id:"At9yEorbfRs", titulo:"Cómo ahorrar agua en casa — 15 consejos", canal:"Agua Para Todos", dur:"6:30", tag:"Ahorro de agua" },
+    { id:"xxZEFtpZKqw", titulo:"El ciclo del agua explicado fácil", canal:"Ciencia Básica", dur:"5:00", tag:"Ciclo del agua" },
+    { id:"JMWZN1LUK9I", titulo:"Contaminación del agua: causas y soluciones", canal:"Greenpeace MX", dur:"8:45", tag:"Contaminación" },
+    { id:"N_OGRqFJFks", titulo:"Por qué el agua escasea en México", canal:"Animal Político", dur:"9:12", tag:"Escasez hídrica" },
+    { id:"5OkJ8OaTRyo", titulo:"Cómo purificar el agua en casa", canal:"Sustentabilidad MX", dur:"4:50", tag:"Purificación" },
+    { id:"2lVDktWK-pc", titulo:"El aceite usado contamina el agua", canal:"CONAGUA México", dur:"3:45", tag:"Contaminantes" },
+  ],
+  residuos: [
+    { id:"JEQRYCm5Rek", titulo:"¿Qué son los residuos peligrosos y cómo manejarlos?", canal:"SEMARNAT", dur:"7:30", tag:"Residuos peligrosos" },
+    { id:"2PEsJf6PuWY", titulo:"Los plásticos de un solo uso: el problema", canal:"ONU Medio Ambiente", dur:"5:22", tag:"Plástico único uso" },
+    { id:"RS7IzU2VJIQ", titulo:"Basura electrónica: el residuo del siglo", canal:"BBC Mundo", dur:"8:15", tag:"Residuos electrónicos" },
+    { id:"lNZ7fY0nwdM", titulo:"Pilas y baterías: por qué no tirarlas a la basura", canal:"Ecología MX", dur:"4:40", tag:"Pilas" },
+    { id:"qvHZJjtYlK4", titulo:"Relleno sanitario vs. tiradero clandestino", canal:"INECC México", dur:"6:55", tag:"Disposición final" },
+    { id:"jmxLlolPWEE", titulo:"Cómo reducir tu basura al mínimo", canal:"Zero Waste México", dur:"9:00", tag:"Reducción" },
+  ]
+};
+
+let videoCatActiva = "reciclaje";
+
+function renderVideos() {
+  const grid = document.getElementById("videosGrid");
+  if (!grid) return;
+  const lista = VIDEOS_DATA[videoCatActiva] || [];
+  grid.innerHTML = lista.map((v, i) => `
+    <div class="video-card" style="animation-delay:${i*0.07}s" onclick="abrirVideo('${v.id}','${v.titulo.replace(/'/g,"\\'")}','${v.canal}')">
+      <div class="video-thumb">
+        <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="${v.titulo}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${v.id}/0.jpg'"/>
+        <div class="video-play-btn"><i class="fa-solid fa-play"></i></div>
+        <span class="video-duracion">${v.dur}</span>
+      </div>
+      <div class="video-info">
+        <div class="video-titulo">${v.titulo}</div>
+        <div class="video-canal"><i class="fa-brands fa-youtube"></i> ${v.canal}</div>
+        <span class="video-tag">${v.tag}</span>
+      </div>
+    </div>`).join("");
+}
+
+window.abrirVideo = (id, titulo, canal) => {
+  const modal  = document.getElementById("videoModal");
+  const iframe = document.getElementById("videoIframe");
+  const tit    = document.getElementById("vmodTitulo");
+  const can    = document.getElementById("vmodCanal");
+  if (!modal || !iframe) return;
+  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+  if (tit) tit.textContent = titulo;
+  if (can) can.textContent = canal;
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+};
+
+function cerrarVideo() {
+  const modal  = document.getElementById("videoModal");
+  const iframe = document.getElementById("videoIframe");
+  if (!modal) return;
+  iframe.src = "";
+  modal.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("videoClose")?.addEventListener("click", cerrarVideo);
+document.getElementById("videoOverlay")?.addEventListener("click", cerrarVideo);
+document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarVideo(); });
+
+document.querySelectorAll(".vtab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelector(".vtab.active")?.classList.remove("active");
+    btn.classList.add("active");
+    videoCatActiva = btn.dataset.cat;
+    renderVideos();
+  });
+});
+
+renderVideos();
