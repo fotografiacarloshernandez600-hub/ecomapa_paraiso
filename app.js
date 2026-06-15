@@ -1344,16 +1344,8 @@ function renderVideos() {
 }
 
 window.abrirVideo = (id, titulo, canal) => {
-  const modal  = document.getElementById("videoModal");
-  const iframe = document.getElementById("videoIframe");
-  const tit    = document.getElementById("vmodTitulo");
-  const can    = document.getElementById("vmodCanal");
-  if (!modal || !iframe) return;
-  iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
-  if (tit) tit.textContent = titulo;
-  if (can) can.textContent = canal;
-  modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  // Abrir directamente en YouTube — evita bloqueos de embedding
+  window.open(`https://www.youtube.com/watch?v=${id}`, "_blank");
 };
 
 function cerrarVideo() {
