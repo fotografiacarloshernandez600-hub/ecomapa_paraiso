@@ -1,0 +1,35 @@
+{
+  "name": "ecomapa-paraiso-movil",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare:android": "node scripts/prepare-cordova.mjs",
+    "android": "npm run prepare:android && cordova build android"
+  },
+  "devDependencies": {
+    "cordova": "^12.0.0",
+    "cordova-android": "^14.0.0",
+    "cordova-plugin-camera": "^8.0.0",
+    "cordova-plugin-contacts": "^3.0.1",
+    "cordova-plugin-device": "^3.0.0",
+    "cordova-plugin-geolocation": "^5.0.0",
+    "cordova-plugin-local-notification": "^1.2.3"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-camera": {
+        "ANDROIDX_CORE_VERSION": "1.6.+"
+      },
+      "cordova-plugin-geolocation": {
+        "GPS_REQUIRED": "true"
+      },
+      "cordova-plugin-contacts": {},
+      "cordova-plugin-local-notification": {
+        "ANDROIDX_CORE_VERSION": "1.12.0"
+      }
+    }
+  }
+}

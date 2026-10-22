@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>EcoReporte Móvil · Paraíso</title><link rel="stylesheet" href="residuo.css"></head>
+<body><header><a href="index.html">← EcoMapa Paraíso</a><h1>EcoReporte Móvil</h1><p>Registra un residuo para solicitar su retiro en Paraíso, Tabasco.</p></header>
+<main><nav><a href="#registro">Registrar</a><a href="#historial">Mi historial</a><a href="index.html#mapa">Puntos de recolección</a></nav>
+<section id="registro" class="card"><h2>Nuevo residuo</h2><p class="hint">Toma una foto y revisa el tipo sugerido antes de enviar.</p>
+<div class="buttons"><button id="camera" type="button">📷 Tomar foto</button><label class="button" for="photo">Elegir foto</label><input id="photo" type="file" accept="image/*" capture="environment" hidden></div><img id="preview" alt="Fotografía del residuo" hidden><p id="prediction" aria-live="polite"></p>
+<label>Tipo de residuo<select id="type" required><option value="">Selecciona el tipo</option><option>Plástico PET</option><option>Vidrio</option><option>Papel y cartón</option><option>Metal</option><option>Pilas y baterías</option><option>Electrónicos</option><option>Aceite usado</option><option>Textiles</option><option>Orgánico</option><option>Otro</option></select></label>
+<label>Descripción<textarea id="description" rows="3" maxlength="500" placeholder="Qué encontraste y cómo identificar el lugar" required></textarea></label>
+<label>Zona o referencia<input id="zone" maxlength="120" placeholder="Calle, colonia o referencia" required></label>
+<div class="buttons"><button id="location" type="button">📍 Marcar mi ubicación</button><a id="maplink" target="_blank" rel="noopener" hidden>Ver punto marcado</a></div><p id="coordinates" aria-live="polite">Ubicación pendiente</p>
+<label>Responsable o contacto (opcional)<input id="responsible" maxlength="100" placeholder="Nombre del responsable"></label><div class="buttons"><button id="contacts" type="button">Elegir de contactos</button><a href="tel:9331363054">Llamar a reportes municipales</a></div>
+<label>Recordarme el seguimiento (opcional)<input id="reminder" type="datetime-local"></label>
+<button id="submit" class="primary" type="button">Guardar y enviar reporte</button><p id="status" role="status" aria-live="polite"></p><p class="hint">Si no hay conexión, el registro queda pendiente en este dispositivo. Al enviarse, su foto se sube a Firebase Storage.</p></section>
+<section id="historial" class="card"><h2>Mi historial local</h2><button id="sync" type="button">Reintentar pendientes</button><div id="records"></div></section></main>
+<script src="cordova.js" onerror="void 0"></script><script type="module" src="residuo.js"></script></body></html>

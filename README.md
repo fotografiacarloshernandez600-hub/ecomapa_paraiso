@@ -68,3 +68,24 @@ ecomapa-paraiso/
 - Publicar avisos municipales
 - Estadísticas: reportes por mes, top colonias, tasa de resolución
 - Roles: admin completo / operador solo resuelve reportes
+
+## EcoReporte Móvil: registro por residuo
+
+Abre `residuo.html` para fotografiar un residuo, recibir una **sugerencia** de tipo mediante MobileNet, corregir el tipo si hace falta, añadir descripción, GPS, responsable y recordatorio. Los registros y fotografías reducidas se guardan en IndexedDB en el dispositivo; al enviar se suben la foto a Firebase Storage y los datos a la colección `residuos` de Firestore. Los pendientes pueden reenviarse desde Mi historial. Los reportes de tiraderos siguen en el formulario anterior y la colección `reportes`.
+
+La clasificación automática requiere internet para cargar el modelo; reconoce objetos comunes, no garantiza el material ni reemplaza la confirmación humana. La primera carga puede tardar. El selector de contactos y las notificaciones funcionan en Android con sus plugins; en navegador el responsable se escribe manualmente y el recordatorio no dispara una notificación del sistema.
+
+**Firebase:** habilita Storage y configura reglas de acceso adecuadas antes de probar el envío; el proyecto no instala reglas automáticamente. Un fallo de Storage deja el registro pendiente en el dispositivo. Para uso público real configura autenticación, reglas de Firestore y Storage, límites de archivos y moderación. No uses reglas abiertas de modo prueba en producción.
+
+### Android con Cordova
+
+Instala Node.js, Android Studio con Android SDK y Java. En la raíz del repositorio:
+
+```bash
+npm install
+npx cordova platform add android
+npx cordova plugin add cordova-plugin-camera cordova-plugin-geolocation cordova-plugin-contacts cordova-plugin-local-notification
+npm run android
+```
+
+`npm run android` copia los archivos actuales a `www/` antes de compilar. APK de depuración: `platforms/android/app/build/outputs/apk/debug/app-debug.apk`. Prueba foto, GPS, permisos, contactos y avisos en un teléfono físico. La web existente de Vercel sigue funcionando y ofrece un enlace al registro por residuo.
