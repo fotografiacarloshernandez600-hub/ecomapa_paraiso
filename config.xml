@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <widget id="mx.tabasco.paraiso.ecomapa" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>EcoReporte Paraíso</name><description>Registro ciudadano de residuos en Paraíso, Tabasco</description><author>Carlos Hernández</author>
-  <content src="residuo.html"/><access origin="*"/><allow-navigation href="https://*/*"/><allow-navigation href="http://*/*"/>
+  <content src="index.html"/><access origin="*"/><allow-navigation href="https://*/*"/><allow-navigation href="http://*/*"/>
   <preference name="AndroidXEnabled" value="true"/><preference name="android-minSdkVersion" value="24"/>
   <platform name="android"><preference name="AndroidWindowSplashScreenBackground" value="#073d34"/></platform>
 </widget>

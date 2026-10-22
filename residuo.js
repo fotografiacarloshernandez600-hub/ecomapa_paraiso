@@ -1,6 +1,4 @@
-import { db } from './firebase-config.js';
-import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+import { supabase } from './supabase-config.js';
 
 const $ = id => document.getElementById(id);
 const DB_NAME = 'ecomapa-residuos';
@@ -99,16 +97,21 @@ function scheduleReminder(record){
 }
 function hash(value){let h=0;for(const c of value)h=((h<<5)-h+c.charCodeAt(0))|0;return h;}
 async function send(record){
-  const storage=getStorage();
-  const photoRef=ref(storage,`residuos/${record.id}.jpg`);
-  await uploadBytes(photoRef,fileFromDataUrl(record.image),{contentType:'image/jpeg'});
-  const photoURL=await getDownloadURL(photoRef);
-  const docRef=await addDoc(collection(db,'residuos'),{
-    tipo:record.type,descripcion:record.description,colonia:record.zone,
-    lat:record.coords.lat,lng:record.coords.lng,responsable:record.responsible,
-    fotoURL:photoURL,estado:'pendiente',fecha:serverTimestamp(),localId:record.id
-  });
-  record.remoteId=docRef.id;record.status='enviado';await save(record);
+  let foto_url = null;
+  if(record.image){
+    const blob=fileFromDataUrl(record.image);
+    const path=`residuos/${record.id}.jpg`;
+    const {error:uploadError}=await supabase.storage.from('residuos').upload(path,blob,{contentType:'image/jpeg',upsert:true});
+    if(uploadError) throw uploadError;
+    foto_url=supabase.storage.from('residuos').getPublicUrl(path).data.publicUrl;
+  }
+  const {data,error}=await supabase.from('residuos').upsert({
+    local_id:record.id,tipo:record.type,descripcion:record.description,colonia:record.zone,
+    lat:record.coords.lat,lng:record.coords.lng,responsable:record.responsible||null,
+    foto_url,estado:'pendiente',recorded_at:record.created
+  },{onConflict:'local_id'}).select('id').single();
+  if(error) throw error;
+  record.remoteId=data.id;record.status='enviado';await save(record);
 }
 async function render(){
   const records=(await all()).sort((a,b)=>b.created.localeCompare(a.created));
@@ -126,7 +129,7 @@ async function render(){
 }
 async function sync(record){
   try{await send(record);msg('Reporte enviado con fotografía y ubicación.');}
-  catch(error){console.error(error);msg('Se guardó localmente. Revisa conexión y permisos de Firebase Storage para enviarlo.');}
+  catch(error){console.error(error);msg('Se guardó localmente. Revisa conexión, tablas y permisos de Supabase para enviarlo.');}
   await render();
 }
 $('submit').addEventListener('click',async()=>{

@@ -1,4 +1,5 @@
 import { db } from "./firebase-config.js";
+import { supabase } from "./supabase-config.js";
 import {
   collection, addDoc, onSnapshot, serverTimestamp, getDocs,
   doc, updateDoc, increment
@@ -180,7 +181,13 @@ window.addEventListener("scroll",()=>{
 });
 
 // ── MAPA LEAFLET ──────────────────────────────────────────────
-const map = L.map("map",{ zoomControl:true }).setView(CENTRO, 13);
+const map = L.map("map",{ zoomControl:true, preferCanvas:true }).setView(CENTRO, 13);
+// Leaflet calcula mal el tamaño si la sección aún está oculta durante la carga.
+const corregirTamanoMapa = () => { if (document.getElementById("map")?.offsetWidth) map.invalidateSize({ pan:false }); };
+window.addEventListener("resize", corregirTamanoMapa);
+window.addEventListener("orientationchange", () => setTimeout(corregirTamanoMapa, 300));
+setTimeout(corregirTamanoMapa, 250);
+document.querySelectorAll('a[href="#mapa"]').forEach(link => link.addEventListener("click", () => setTimeout(corregirTamanoMapa, 350)));
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
   attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   maxZoom:19
@@ -235,20 +242,44 @@ PUNTOS.forEach(p=>agregarAlMapa(p));
 actualizarLista();
 
 // Firebase: escuchar reportes en tiempo real
-const reportesRef = collection(db,"reportes");
-onSnapshot(reportesRef,(snap)=>{
-  snap.docChanges().forEach(ch=>{
-    if(ch.type==="added"){
-      const d = ch.doc.data();
-      if(d.lat && d.lng){
-        agregarAlMapa({ nombre:d.nombre?`Reporte: ${d.nombre}`:"Reporte ciudadano",
-          tipo:"tiradero", lat:d.lat, lng:d.lng,
-          colonia:d.colonia||"", descripcion:d.descripcion||"", fotoURL:d.fotoURL||null });
-      }
-    }
-  });
+const reportesRef = collection(db,"reportes"); // Compatibilidad con funciones antiguas de Firebase
+const idsReportesSupabase = new Set();
+function mostrarReporteSupabase(row){
+  const lat = Number(row.lat), lng = Number(row.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat)>90 || Math.abs(lng)>180) return;
+  const id = String(row.id);
+  const existente = todosMarkers.find(item => item.datos.reporteId === id);
+  const datos = { reporteId:id, nombre:row.nombre ? `Reporte: ${row.nombre}` : "Reporte ciudadano",
+    tipo:"tiradero", lat, lng, colonia:row.colonia||"", descripcion:row.descripcion||"", fotoURL:row.foto_url||row.fotoURL||null };
+  if (existente) {
+    existente.datos = datos;
+    existente.marker.setLatLng([lat,lng]).setIcon(crearIcono("tiradero")).setPopupContent(popupHTML(datos));
+  } else agregarAlMapa(datos);
+  idsReportesSupabase.add(id);
+}
+async function cargarReportesSupabase(){
+  const { data, error } = await supabase.from("reportes").select("*").order("created_at",{ascending:false});
+  if(error){ console.error("Supabase reportes:",error); return; }
+  (data||[]).forEach(mostrarReporteSupabase);
+  aplicarFiltro();
   actualizarLista();
-});
+  setTimeout(corregirTamanoMapa, 100);
+}
+cargarReportesSupabase();
+supabase.channel("reportes-mapa")
+  .on("postgres_changes",{event:"*",schema:"public",table:"reportes"},payload=>{
+    if(payload.eventType==="DELETE"){
+      const id=String(payload.old.id);
+      const idx=todosMarkers.findIndex(item=>item.datos.reporteId===id);
+      if(idx>=0){ map.removeLayer(todosMarkers[idx].marker); todosMarkers.splice(idx,1); }
+      idsReportesSupabase.delete(id);
+      actualizarLista();
+      return;
+    }
+    if(payload.new) mostrarReporteSupabase(payload.new);
+    aplicarFiltro(); actualizarLista();
+    if (typeof actualizarImpacto === "function") actualizarImpacto();
+  }).subscribe();
 
 // ── FILTROS ───────────────────────────────────────────────────
 document.querySelectorAll(".filtro-btn").forEach(btn=>{
@@ -388,12 +419,21 @@ document.getElementById("btnEnviar")?.addEventListener("click",async()=>{
   btn.innerHTML=`<i class="fa-solid fa-spinner fa-spin"></i> Enviando...`;
 
   try{
-    let fotoURL=null; // Storage desactivado — sin foto
-    await addDoc(reportesRef,{
-      nombre,colonia,descripcion:desc,
-      lat:coordsGPS.lat, lng:coordsGPS.lng,
-      fotoURL, fecha:serverTimestamp()
-    });
+    let foto_url = null;
+    const archivo = foto.files?.[0];
+    if (archivo) {
+      const ext = (archivo.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
+      const ruta = `reportes/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("reportes").upload(ruta, archivo, { upsert:false, contentType:archivo.type || "image/jpeg" });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("reportes").getPublicUrl(ruta);
+      foto_url = urlData.publicUrl;
+    }
+    const { data: reporte, error } = await supabase.from("reportes").insert({
+      nombre,colonia,descripcion:desc,lat:coordsGPS.lat,lng:coordsGPS.lng,foto_url
+    }).select().single();
+    if (error) throw error;
+    if (reporte) { mostrarReporteSupabase(reporte); aplicarFiltro(); actualizarLista(); map.setView([Number(reporte.lat),Number(reporte.lng)],16); }
     showMsg("✅ ¡Reporte enviado! Ya aparece en el mapa.","exito");
     document.getElementById("inp-nombre").value="";
     document.getElementById("inp-colonia").value="";
