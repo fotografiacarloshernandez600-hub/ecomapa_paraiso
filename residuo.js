@@ -5,6 +5,13 @@ const DB_NAME = 'ecomapa-residuos';
 let image = null;
 let coords = null;
 let modelPromise;
+let cordovaReady = false;
+const cameraButton = $('camera');
+if(window.cordova){cameraButton.disabled=true;msg('Preparando cámara del dispositivo…');}
+document.addEventListener('deviceready',()=>{
+  cordovaReady=true;cameraButton.disabled=false;
+  msg(navigator.camera ? 'Cámara lista para tomar fotografías.' : 'Plugin de cámara no disponible. Reconstruye el APK.');
+},false);
 const TYPES = [
   [/bottle|plastic|water bottle|pop bottle/i,'Plástico PET'],
   [/glass|wine bottle|beer bottle|jar/i,'Vidrio'],
@@ -66,7 +73,7 @@ async function classifyPhoto(){
   } catch(error){ console.warn('Clasificador no disponible',error); $('prediction').textContent='Clasificación automática no disponible sin conexión. Selecciona el tipo manualmente.'; }
 }
 function loadScript(src){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.head.append(script);});}
-$('photo').addEventListener('change',event=>{if(event.target.files[0]) normalizePhoto(event.target.files[0]).catch(()=>msg('No pude leer esa foto.'));});
+$('photo').addEventListener('change',event=>{if(event.target.files[0]) normalizePhoto(event.target.files[0]).then(()=>captureLocation()).catch(error=>msg('No pude leer esa foto: '+(error?.message||error)));});
 // FILE_URI evita transferir fotografías grandes como cadenas base64 por el puente nativo.
 function cameraFileToBlob(uri){
   return new Promise((resolve,reject)=>{
@@ -95,25 +102,39 @@ function captureLocation(){
   },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
 }
 $('camera').addEventListener('click',()=>{
-  if(!navigator.camera){$('photo').click();return;}
+  if(window.cordova && !cordovaReady){msg('La cámara aún está iniciando. Intenta de nuevo.');return;}
+  if(!navigator.camera){msg('El plugin nativo de cámara no está disponible. Comprueba que instalaste el APK actualizado.');return;}
   msg('Abriendo cámara…');
-  navigator.camera.getPicture(async uri=>{
-    try{
-      msg('Procesando fotografía…');
-      const blob=await cameraFileToBlob(uri);
-      await normalizePhoto(blob);
-      msg('Fotografía lista. Ubicación GPS en proceso.');
-      captureLocation();
-    }catch(error){
-      console.error('Error al procesar fotografía de cámara',error);
-      msg('Error al cargar foto de cámara: '+(error?.message||String(error)));
-    }
-  },error=>msg(`Cámara: ${error}`),{
-    quality:70,destinationType:Camera.DestinationType.FILE_URI,sourceType:Camera.PictureSourceType.CAMERA,
+  navigator.camera.getPicture(uri=>handleCameraResult(uri),
+    error=>msg('Cámara: '+(error?.message||error)),{
+    quality:65,destinationType:Camera.DestinationType.FILE_URI,sourceType:Camera.PictureSourceType.CAMERA,
     encodingType:Camera.EncodingType.JPEG,targetWidth:1024,targetHeight:1024,correctOrientation:true,
     saveToPhotoAlbum:false
   });
 });
+async function handleCameraResult(uri){
+  try{
+    msg('Procesando fotografía tomada…');
+    const blob=await cameraFileToBlob(uri);
+    await normalizePhoto(blob);
+    msg('Fotografía cargada. Detectando ubicación…');
+    captureLocation();
+  }catch(error){
+    console.error('Error de cámara',error);
+    msg('No se pudo recuperar la foto: '+(error?.message||String(error)));
+  }
+}
+// Android puede destruir el WebView mientras se abre la aplicación de cámara.
+// Cordova devuelve entonces el resultado pendiente mediante el evento resume.
+document.addEventListener('resume',event=>{
+  const pending=event?.pendingResult;
+  if(!pending || pending.pluginService!=='Camera')return;
+  if(pending.pluginStatus==='OK' && pending.result){
+    handleCameraResult(pending.result);
+  }else if(pending.pluginStatus!=='OK'){
+    msg('La cámara no devolvió la fotografía: '+(pending.result||pending.pluginStatus));
+  }
+},false);
 $('location').addEventListener('click',captureLocation);
 $('contacts').addEventListener('click',()=>{
   if(!navigator.contacts?.pickContact){msg('Selector de contactos disponible en la app Android. Puedes escribir el nombre manualmente.');return;}
