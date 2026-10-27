@@ -5,6 +5,12 @@ const DB_NAME = 'ecomapa-residuos';
 let image = null;
 let coords = null;
 let modelPromise;
+// No deshabilitar el botón: el evento deviceready puede llegar antes de cargar el módulo.
+let cordovaReady = !!navigator.camera;
+document.addEventListener('deviceready',()=>{
+  cordovaReady=true;
+  msg(navigator.camera ? 'Cámara lista para tomar fotografías.' : 'Plugin de cámara no disponible.');
+},false);
 const TYPES = [
   [/bottle|plastic|water bottle|pop bottle/i,'Plástico PET'],
   [/glass|wine bottle|beer bottle|jar/i,'Vidrio'],
@@ -48,7 +54,7 @@ async function normalizePhoto(source){
     const canvas=document.createElement('canvas'); canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale);
     canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
     image=canvas.toDataURL('image/jpeg',.78); $('preview').src=image; $('preview').hidden=false;
-    $('prediction').textContent='Analizando imagen…'; await classifyPhoto();
+    $('prediction').textContent='Analizando imagen…'; classifyPhoto();
   } finally { if(typeof source!=='string') URL.revokeObjectURL(url); }
 }
 async function classifyPhoto(){
@@ -66,23 +72,69 @@ async function classifyPhoto(){
   } catch(error){ console.warn('Clasificador no disponible',error); $('prediction').textContent='Clasificación automática no disponible sin conexión. Selecciona el tipo manualmente.'; }
 }
 function loadScript(src){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=reject;document.head.append(script);});}
-$('photo').addEventListener('change',event=>{if(event.target.files[0]) normalizePhoto(event.target.files[0]).catch(()=>msg('No pude leer esa foto.'));});
-$('camera').addEventListener('click',()=>{
-  if(!navigator.camera){$('photo').click();return;}
-  navigator.camera.getPicture(base64=>normalizePhoto(`data:image/jpeg;base64,${base64}`).catch(error=>{console.error(error);msg('No pude leer la fotografía: '+error.message);}),error=>msg(`Cámara: ${error}`),{
-    quality:75,destinationType:Camera.DestinationType.DATA_URL,sourceType:Camera.PictureSourceType.CAMERA,
-    encodingType:Camera.EncodingType.JPEG,targetWidth:1280,targetHeight:1280,correctOrientation:true
+$('photo').addEventListener('change',event=>{if(event.target.files[0]) normalizePhoto(event.target.files[0]).then(()=>captureLocation()).catch(error=>msg('No pude leer esa foto: '+(error?.message||error)));});
+// FILE_URI evita transferir fotografías grandes como cadenas base64 por el puente nativo.
+function cameraFileToBlob(uri){
+  return new Promise((resolve,reject)=>{
+    if(typeof window.resolveLocalFileSystemURL!=='function'){
+      reject(new Error('Falta cordova-plugin-file. Instálalo y vuelve a generar el APK.'));return;
+    }
+    window.resolveLocalFileSystemURL(uri,entry=>{
+      entry.file(file=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(new Blob([reader.result],{type:file.type||'image/jpeg'}));
+        reader.onerror=()=>reject(reader.error||new Error('No se pudo leer el archivo de la cámara'));
+        reader.readAsArrayBuffer(file);
+      },reject);
+    },reject);
   });
-});
-$('location').addEventListener('click',()=>{
-  $('coordinates').textContent='Buscando ubicación…';
+}
+function captureLocation(){
+  $('coordinates').textContent='📍 Detectando ubicación GPS automáticamente…';
   navigator.geolocation.getCurrentPosition(({coords:point})=>{
     coords={lat:point.latitude,lng:point.longitude};
     $('coordinates').textContent=`📍 ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)} (precisión ±${Math.round(point.accuracy)} m)`;
     $('maplink').href=`https://www.openstreetmap.org/?mlat=${coords.lat}&mlon=${coords.lng}#map=17/${coords.lat}/${coords.lng}`;
     $('maplink').hidden=false;
-  },error=>$('coordinates').textContent=`No se obtuvo GPS: ${error.message}`,{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+  },error=>{
+    $('coordinates').textContent=`GPS automático falló: ${error.message}. Pulsa «Marcar mi ubicación» para reintentar.`;
+  },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
+}
+$('camera').addEventListener('click',()=>{
+  if(window.cordova && !cordovaReady && navigator.camera) cordovaReady=true;
+  if(!navigator.camera){msg('El plugin nativo de cámara no está disponible. Comprueba que instalaste el APK actualizado.');return;}
+  msg('Abriendo cámara…');
+  navigator.camera.getPicture(uri=>handleCameraResult(uri),
+    error=>msg('Cámara: '+(error?.message||error)),{
+    quality:65,destinationType:Camera.DestinationType.FILE_URI,sourceType:Camera.PictureSourceType.CAMERA,
+    encodingType:Camera.EncodingType.JPEG,targetWidth:1024,targetHeight:1024,correctOrientation:true,
+    saveToPhotoAlbum:false
+  });
 });
+async function handleCameraResult(uri){
+  try{
+    msg('Procesando fotografía tomada…');
+    const blob=await cameraFileToBlob(uri);
+    await normalizePhoto(blob);
+    msg('Fotografía cargada. Detectando ubicación…');
+    captureLocation();
+  }catch(error){
+    console.error('Error de cámara',error);
+    msg('No se pudo recuperar la foto: '+(error?.message||String(error)));
+  }
+}
+// Android puede destruir el WebView mientras se abre la aplicación de cámara.
+// Cordova devuelve entonces el resultado pendiente mediante el evento resume.
+document.addEventListener('resume',event=>{
+  const pending=event?.pendingResult;
+  if(!pending || pending.pluginService!=='Camera')return;
+  if(pending.pluginStatus==='OK' && pending.result){
+    handleCameraResult(pending.result);
+  }else if(pending.pluginStatus!=='OK'){
+    msg('La cámara no devolvió la fotografía: '+(pending.result||pending.pluginStatus));
+  }
+},false);
+$('location').addEventListener('click',captureLocation);
 $('contacts').addEventListener('click',()=>{
   if(!navigator.contacts?.pickContact){msg('Selector de contactos disponible en la app Android. Puedes escribir el nombre manualmente.');return;}
   navigator.contacts.pickContact(contact=>{ $('responsible').value=contact.displayName||contact.name?.formatted||''; },error=>msg(`No se seleccionó contacto: ${error}`),{filter:['displayName','name']});
