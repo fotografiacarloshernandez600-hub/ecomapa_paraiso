@@ -10,6 +10,6 @@
 <div class="buttons"><button id="location" type="button">📍 Marcar mi ubicación</button><a id="maplink" target="_blank" rel="noopener" hidden>Ver punto marcado</a></div><p id="coordinates" aria-live="polite">Ubicación pendiente</p>
 <label>Responsable o contacto (opcional)<input id="responsible" maxlength="100" placeholder="Nombre del responsable"></label><div class="buttons"><button id="contacts" type="button">Elegir de contactos</button><a href="tel:9331363054">Llamar a reportes municipales</a></div>
 <label>Recordarme el seguimiento (opcional)<input id="reminder" type="datetime-local"></label>
-<button id="submit" class="primary" type="button">Guardar y enviar reporte</button><p id="status" role="status" aria-live="polite"></p><p class="hint">Si no hay conexión, el registro queda pendiente en este dispositivo. Al enviarse, su foto se sube a Firebase Storage.</p></section>
+<button id="submit" class="primary" type="button">Guardar y enviar reporte</button><p id="status" role="status" aria-live="polite"></p><p class="hint">Si no hay conexión, el registro queda pendiente en este dispositivo. Al enviarse, su foto se sube a Supabase Storage y el reporte aparece en el mapa municipal.</p></section>
 <section id="historial" class="card"><h2>Mi historial local</h2><button id="sync" type="button">Reintentar pendientes</button><div id="records"></div></section></main>
 <script src="cordova.js" onerror="void 0"></script><script type="module" src="residuo.js"></script></body></html>

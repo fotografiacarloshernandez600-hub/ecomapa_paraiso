@@ -266,6 +266,29 @@ async function cargarReportesSupabase(){
   setTimeout(corregirTamanoMapa, 100);
 }
 cargarReportesSupabase();
+// EcoReporte Android almacena en "residuos"; mostrar esos registros en el mismo mapa.
+function mostrarResiduoMovil(row){
+  mostrarReporteSupabase({
+    id: "movil-" + row.id,
+    nombre: row.tipo ? "EcoReporte: " + row.tipo : "EcoReporte móvil",
+    colonia: row.colonia,
+    descripcion: row.descripcion,
+    lat: row.lat, lng: row.lng, foto_url: row.foto_url
+  });
+}
+async function cargarResiduosMoviles(){
+  const {data,error}=await supabase.from("residuos").select("id,tipo,descripcion,colonia,lat,lng,foto_url").order("created_at",{ascending:false}).limit(500);
+  if(error){console.error("EcoReporte móvil:",error);return;}
+  (data||[]).forEach(mostrarResiduoMovil);
+  aplicarFiltro(); actualizarLista();
+}
+cargarResiduosMoviles();
+supabase.channel("residuos-mapa")
+  .on("postgres_changes",{event:"INSERT",schema:"public",table:"residuos"},payload=>{
+    if(payload.new){mostrarResiduoMovil(payload.new);aplicarFiltro();actualizarLista();}
+  }).subscribe();
+// Refresco alternativo si Realtime no está habilitado para la tabla.
+setInterval(cargarResiduosMoviles,60000);
 supabase.channel("reportes-mapa")
   .on("postgres_changes",{event:"*",schema:"public",table:"reportes"},payload=>{
     if(payload.eventType==="DELETE"){

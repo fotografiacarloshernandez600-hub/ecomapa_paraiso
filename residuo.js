@@ -69,7 +69,7 @@ function loadScript(src){return new Promise((resolve,reject)=>{const script=docu
 $('photo').addEventListener('change',event=>{if(event.target.files[0]) normalizePhoto(event.target.files[0]).catch(()=>msg('No pude leer esa foto.'));});
 $('camera').addEventListener('click',()=>{
   if(!navigator.camera){$('photo').click();return;}
-  navigator.camera.getPicture(uri=>normalizePhoto(uri).catch(()=>msg('No pude leer la fotografía.')),error=>msg(`Cámara: ${error}`),{
+  navigator.camera.getPicture(base64=>normalizePhoto(`data:image/jpeg;base64,${base64}`).catch(error=>{console.error(error);msg('No pude leer la fotografía: '+error.message);}),error=>msg(`Cámara: ${error}`),{
     quality:75,destinationType:Camera.DestinationType.DATA_URL,sourceType:Camera.PictureSourceType.CAMERA,
     encodingType:Camera.EncodingType.JPEG,targetWidth:1280,targetHeight:1280,correctOrientation:true
   });
@@ -129,13 +129,13 @@ async function render(){
 }
 async function sync(record){
   try{await send(record);msg('Reporte enviado con fotografía y ubicación.');}
-  catch(error){console.error(error);msg('Se guardó localmente. Revisa conexión, tablas y permisos de Supabase para enviarlo.');}
+  catch(error){console.error(error);msg('Guardado en el celular, pendiente de envío: '+(error?.message||String(error)));}
   await render();
 }
 $('submit').addEventListener('click',async()=>{
   const type=$('type').value,description=$('description').value.trim(),zone=$('zone').value.trim();
   if(!image||!type||!description||!zone||!coords){msg('Completa foto, tipo, descripción, zona y ubicación GPS.');return;}
-  const record={id:crypto.randomUUID(),type,description,zone,coords,image,responsible:$('responsible').value.trim(),reminder:$('reminder').value,created:new Date().toISOString(),status:'pendiente'};
+  const record={id:(globalThis.crypto?.randomUUID?.()||('r-'+Date.now()+'-'+Math.random().toString(36).slice(2))),type,description,zone,coords,image,responsible:$('responsible').value.trim(),reminder:$('reminder').value,created:new Date().toISOString(),status:'pendiente'};
   $('submit').disabled=true;
   try{await save(record);scheduleReminder(record);msg('Registro guardado en el dispositivo. Enviando…');await sync(record);}
   catch(error){console.error(error);msg('No se pudo guardar en el dispositivo. Libera espacio e inténtalo de nuevo.');}
