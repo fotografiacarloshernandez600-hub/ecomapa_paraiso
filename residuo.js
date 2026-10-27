@@ -5,12 +5,11 @@ const DB_NAME = 'ecomapa-residuos';
 let image = null;
 let coords = null;
 let modelPromise;
-let cordovaReady = false;
-const cameraButton = $('camera');
-if(window.cordova){cameraButton.disabled=true;msg('Preparando cámara del dispositivo…');}
+// No deshabilitar el botón: el evento deviceready puede llegar antes de cargar el módulo.
+let cordovaReady = !!navigator.camera;
 document.addEventListener('deviceready',()=>{
-  cordovaReady=true;cameraButton.disabled=false;
-  msg(navigator.camera ? 'Cámara lista para tomar fotografías.' : 'Plugin de cámara no disponible. Reconstruye el APK.');
+  cordovaReady=true;
+  msg(navigator.camera ? 'Cámara lista para tomar fotografías.' : 'Plugin de cámara no disponible.');
 },false);
 const TYPES = [
   [/bottle|plastic|water bottle|pop bottle/i,'Plástico PET'],
@@ -102,7 +101,7 @@ function captureLocation(){
   },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
 }
 $('camera').addEventListener('click',()=>{
-  if(window.cordova && !cordovaReady){msg('La cámara aún está iniciando. Intenta de nuevo.');return;}
+  if(window.cordova && !cordovaReady && navigator.camera) cordovaReady=true;
   if(!navigator.camera){msg('El plugin nativo de cámara no está disponible. Comprueba que instalaste el APK actualizado.');return;}
   msg('Abriendo cámara…');
   navigator.camera.getPicture(uri=>handleCameraResult(uri),
